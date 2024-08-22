@@ -1,0 +1,148 @@
+/* Basic reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main container for horizontal alignment */
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px; /* Space between the two containers */
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+/* Upgrade link styling */
+.upgrade {
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+  color: #444;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* Auth button styling */
+.auth-button {
+  display: block;
+  padding: 10px 40px;
+  margin: 40px auto;
+  margin-bottom: 10px;
+  color: #333;
+  background-color: #fff;
+  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-button:hover {
+  background-color: #f3f3f7;
+}
+
+.auth-button:disabled {
+  background-color: #9eb5e3;
+  cursor: not-allowed;
+}
+
+/* Container for the Gmail API component */
+.clear-container, .summarize-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 600px;
+  min-width: 400px; /* Adjusted for better responsiveness */
+  width: 90%; /* Use full width of the container */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading style */
+.clear-container h1, .summarize-container h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: black;
+  text-align: center;
+}
+
+.clear-container h2, .summarize-container h2 {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #3e3e3e;
+  font-weight: 400;
+  text-align: center;
+}
+
+.clear-container p {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+/* Button styles */
+.clear-container button {
+  padding: 10px;
+  margin: 5px 5px; /* Margin for spacing */
+  margin-left: 10px;
+  width: 45%;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  background-color: #007bff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clear-container button:hover {
+  background-color: #0056b3;
+}
+
+.clear-container button:disabled {
+  background-color: #d6d6d6;
+  cursor: not-allowed;
+}
+
+/* Content area styling */
+.clear-container pre {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  overflow-x: auto;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Container for the selectors */
+.selectors-container {
+  display: flex;
+  gap: 20px; /* Space between selectors */
+  margin-bottom: 10px; /* Space below the container */
+}
+
+/* Individual selector styles */
+.category-selector, .time-range-selector {
+  flex: 1; /* Allow both selectors to grow equally */
+}
+
+/* Ensure labels are correctly spaced */
+.category-selector label, .time-range-selector label {
+  margin-right: 10px; /* Space between the label and the select input */
+}
+
+.summarize-container button {
+  padding: 10px 40px;
+  display: flex;
+  margin: 5px auto; /* Margin for spacing */
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  background-color: #007bff;
+  font-size: 16px;
+  cursor: pointer;
+}

@@ -1,0 +1,22 @@
+/* src/components/FAQ.css */
+.faq {
+    padding: 20px;
+  }
+  
+  .faq h1 {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .faq-item {
+    margin: 20px 0;
+  }
+  
+  .faq-item h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .faq-item p {
+    font-size: 1em;
+  }  
