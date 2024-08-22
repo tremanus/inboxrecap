@@ -23,10 +23,10 @@ const Footer = () => (
 
       <div className="footer-section">
         <h3>Follow Us</h3>
-        <a href="https://instagram.com/inboxrecap" target="_blank" rel="noopener noreferrer" className="social-icon">IG</a>
+        <a href="https://instagram.com/inboxrecap" target="_blank" rel="noopener noreferrer" className="social-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"></img></a>
         <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon">TW</a>
         <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon">LI</a>
-        <p>Made by <a href="https://tremanus.github.io">Biya</a></p>
+        <p className="personal">Made by <a href="https://tremanus.github.io">Biya</a></p>
       </div>
     </div>
 
