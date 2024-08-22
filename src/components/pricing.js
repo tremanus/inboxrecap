@@ -1,6 +1,7 @@
-// app/pricing/page.js
+"use client"; // Add this directive to mark this file as a client component
+
 import React, { useState, useEffect } from 'react';
-import './pricing.css'; // Ensure the CSS file is correctly placed and imported
+import './pricing.css';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const Pricing = () => {
@@ -106,9 +107,10 @@ const Pricing = () => {
       </div>
       <div className="pricing-plans">
         {plansToDisplay.map((plan, index) => {
-          const featureList = plan.features.map((feature, idx) => (
+          const featuresArray = plan.features || [];
+          const featureList = Array.isArray(featuresArray) ? featuresArray.map((feature, idx) => (
             <li key={idx}>{feature}</li>
-          ));
+          )) : null;
 
           return (
             <div className="pricing-plan" key={index}>

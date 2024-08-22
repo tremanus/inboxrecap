@@ -1,15 +1,17 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // Use this for Next.js 13+
+import { useAuth0 } from '@auth0/auth0-react';
+import EmailCounter from './emailcounter';
 import './home.css';
 import './pricing.css';
-import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
-import EmailCounter from './emailcounter';
 
 const Home = () => {
   const [isYearly, setIsYearly] = useState(false);
   const { loginWithRedirect, isAuthenticated, user } = useAuth0(); // Get Auth0 hooks including user
   const [setRedirectLink] = useState('');
-  const navigate = useNavigate();
+  const router = useRouter(); // Initialize useRouter
 
   useEffect(() => {
     document.title = "InboxRecap | Clear & Summarize Your Inbox";
@@ -20,7 +22,7 @@ const Home = () => {
   };
 
   const handlePricingClick = () => {
-    navigate('/pricing');
+    router.push('/pricing'); // Use router.push for navigation
   };
 
   const monthlyPlans = [

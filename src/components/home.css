@@ -85,14 +85,6 @@
   margin: 0; /* Remove default margin */
 }
 
-.count-display {
-  font-size: 5rem;
-  font-weight: bold;
-  color: #007BFF; /* Blue color for count */
-  transition: transform 0.2s ease-in-out;
-  animation: bounce 1s infinite;
-  /* Remove background and border properties */
-}
 /* Features Section */
 .features {
   padding: 20px 0;

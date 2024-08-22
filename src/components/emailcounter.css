@@ -57,7 +57,7 @@
     right: 2px;
     padding: 4px 12px;
     background-color: #f00;
-    color: #fff;
+    color: white;
     font-size: 1.2rem;
     font-weight: 500;
     border-radius: 20px;
@@ -73,7 +73,7 @@
     top: 150px;
     right: 235px;
     font-size: 10rem;
-    color: #f00;
+    color: green;
     opacity: 0;
     transition: opacity 0.5s ease-in;
 }

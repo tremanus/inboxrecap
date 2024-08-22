@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import './footer.css'; // Import your CSS for styling
 
