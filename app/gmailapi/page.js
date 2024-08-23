@@ -8,6 +8,8 @@ const GmailApi = () => {
   const [loading, setLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [summarizing, setSummarizing] = useState(false); // New state for summarizing
+  const [summary, setSummary] = useState(null); // New state for the summary result
   const [userEmail, setUserEmail] = useState(null);
   const [category, setCategory] = useState('all');
   const [timeRange, setTimeRange] = useState('all');
@@ -109,6 +111,47 @@ const GmailApi = () => {
     }
   };
 
+  const summarizeLatestEmail = async () => {
+    setSummarizing(true);
+    setSummary(null);
+    setError(null);
+
+    try {
+      // Step 1: Fetch the latest unread email
+      const response = await fetch(`/api/reademail?category=${category}&timeRange=${timeRange}`);
+      const emailData = await response.json();
+
+      if (!emailData.email) {
+        setError('No unread emails found.');
+        return;
+      }
+
+      const emailContent = emailData.email.snippet || '';
+
+      // Step 2: Send the email content to the summarize endpoint
+      const summarizeResponse = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emailContent }),
+      });
+
+      const summarizeData = await summarizeResponse.json();
+
+      if (summarizeData.summary) {
+        setSummary(summarizeData.summary);
+      } else {
+        setError('Failed to summarize email.');
+      }
+    } catch (error) {
+      console.error('Error summarizing latest email:', error);
+      setError('Failed to summarize the latest email.');
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
   useEffect(() => {
     checkAuthorization(); // Check authorization on component mount
     const intervalId = setInterval(() => {
@@ -136,54 +179,71 @@ const GmailApi = () => {
         </button>
       )}
       {authorized && (
-        <div className="clear-container">
-          <h1>Clear Your Inbox</h1>
-          <h2>Clean up your unwanted emails and save storage</h2>
+        <div className="main-container">
+          <div className="clear-container">
+            <h1>Clear Your Inbox</h1>
+            <h2>Clean up your unwanted emails and save storage</h2>
 
-          <div className="selectors-container">
-            <div className="category-selector">
-              <label htmlFor="category-select">Select Category: </label>
-              <select
-                id="category-select"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="all">All Mail</option>
-                <option value="promotions">Promotions</option>
-                <option value="social">Social</option>
-                <option value="updates">Updates</option>
-              </select>
+            <div className="selectors-container">
+              <div className="category-selector">
+                <label htmlFor="category-select">Select Category: </label>
+                <select
+                  id="category-select"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="all">All Mail</option>
+                  <option value="promotions">Promotions</option>
+                  <option value="social">Social</option>
+                  <option value="updates">Updates</option>
+                </select>
+              </div>
+
+              <div className="time-range-selector">
+                <label htmlFor="time-range-select">Select Time Range: </label>
+                <select
+                  id="time-range-select"
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value)}
+                >
+                  <option value="1d">Last 24 hours</option>
+                  <option value="1w">Last 7 days</option>
+                  <option value="1m">Last 30 days</option>
+                  <option value="6m">Last 6 months</option>
+                  <option value="all">All Time</option>
+                </select>
+              </div>
             </div>
 
-            <div className="time-range-selector">
-              <label htmlFor="time-range-select">Select Time Range: </label>
-              <select
-                id="time-range-select"
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-              >
-                <option value="1d">Last 24 hours</option>
-                <option value="1w">Last 7 days</option>
-                <option value="1m">Last 30 days</option>
-                <option value="6m">Last 6 months</option>
-                <option value="all">All Time</option>
-              </select>
-            </div>
+            <p>
+              {loading ? 'Loading...' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}
+            </p>
+
+            {error && <p className="error-message">{error}</p>}
+
+            <button onClick={markAsRead} disabled={loading || markingAsRead}>
+              {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}
+            </button>
+
+            <button onClick={deleteEmails} disabled={loading || deleting}>
+              {deleting ? 'Moving to Trash...' : 'Delete Emails'}
+            </button>
           </div>
+          <div className="summarize-container">
+            <h1>Clear & Summarize</h1>
+            <h2>Mark emails as read and receive one sentence recaps of each</h2>
 
-          <p>
-            {loading ? 'Loading...' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}
-          </p>
+            <button onClick={summarizeLatestEmail} disabled={summarizing || loading}>
+              {summarizing ? 'Summarizing...' : 'Summarize Latest Unread Email'}
+            </button>
 
-          {error && <p className="error-message">{error}</p>}
-
-          <button onClick={markAsRead} disabled={loading || markingAsRead}>
-            {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}
-          </button>
-
-          <button onClick={deleteEmails} disabled={loading || deleting}>
-            {deleting ? 'Moving to Trash...' : 'Delete Emails'}
-          </button>
+            {summary && (
+              <div className="summary-result">
+                <h3>Summary:</h3>
+                <p>{summary}</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
