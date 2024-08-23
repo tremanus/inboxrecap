@@ -5,19 +5,32 @@ import '../../src/components/gmailapi.css'; // Ensure this path is correct
 
 const GmailApi = () => {
   const [unreadCount, setUnreadCount] = useState(null);
-  const [loading, setLoading] = useState(false); // General loading state
-  const [markingAsRead, setMarkingAsRead] = useState(false); // State for "Mark as Read" action
-  const [deleting, setDeleting] = useState(false); // State for "Delete Emails" action
-  const [userEmail, setUserEmail] = useState(null); // State to store user email
-  const [category, setCategory] = useState('all'); // State for email category
-  const [timeRange, setTimeRange] = useState('all'); // State for time range
+  const [loading, setLoading] = useState(false);
+  const [markingAsRead, setMarkingAsRead] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
+  const [category, setCategory] = useState('all');
+  const [timeRange, setTimeRange] = useState('all');
+  const [authorized, setAuthorized] = useState(false);
+
+  const checkAuthorization = async () => {
+    try {
+      const response = await fetch('/api/check-authorization');
+      const data = await response.json();
+      setAuthorized(data.authorized);
+      if (data.authorized) {
+        fetchUserEmail(); // Fetch user email if authorized
+      }
+    } catch (error) {
+      console.error('Error checking authorization:', error);
+    }
+  };
 
   const fetchUnreadEmailCount = async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/markasread?category=${category}&timeRange=${timeRange}`);
       const data = await response.json();
-      console.log('Unread email count response:', data); // Log the response
       setUnreadCount(data.unreadCount || 0);
     } catch (error) {
       console.error('Error fetching unread emails:', error);
@@ -28,17 +41,16 @@ const GmailApi = () => {
 
   const fetchUserEmail = async () => {
     try {
-      const response = await fetch('/api/get-user-email'); // Create this endpoint
+      const response = await fetch('/api/get-user-email');
       const data = await response.json();
-      console.log('User email response:', data); // Log the response
-      setUserEmail(data.email || ''); // Set user email to state
+      setUserEmail(data.email || '');
     } catch (error) {
       console.error('Error fetching user email:', error);
     }
   };
 
   const markAsRead = async () => {
-    setMarkingAsRead(true); // Set marking as read state to true
+    setMarkingAsRead(true);
     try {
       const response = await fetch('/api/mark-as-read', {
         method: 'POST',
@@ -48,21 +60,20 @@ const GmailApi = () => {
         body: JSON.stringify({ category, timeRange }),
       });
       const data = await response.json();
-      console.log('Mark as read response:', data); // Log the response
       if (data.success) {
-        fetchUnreadEmailCount(); // Refresh unread count after marking as read
+        fetchUnreadEmailCount();
       } else {
         console.error('Error marking emails as read:', data.error);
       }
     } catch (error) {
       console.error('Error marking emails as read:', error);
     } finally {
-      setMarkingAsRead(false); // Reset marking as read state
+      setMarkingAsRead(false);
     }
   };
 
   const deleteEmails = async () => {
-    setDeleting(true); // Set deleting state to true
+    setDeleting(true);
     try {
       const response = await fetch('/api/movetotrash', {
         method: 'POST',
@@ -72,38 +83,49 @@ const GmailApi = () => {
         body: JSON.stringify({ category, timeRange }),
       });
       const data = await response.json();
-      console.log('Delete emails response:', data); // Log the response
       if (data.success) {
-        fetchUnreadEmailCount(); // Refresh unread count after deleting emails
+        fetchUnreadEmailCount();
       } else {
         console.error('Error deleting emails:', data.error);
       }
     } catch (error) {
       console.error('Error deleting emails:', error);
     } finally {
-      setDeleting(false); // Reset deleting state
+      setDeleting(false);
     }
   };
 
   useEffect(() => {
+    checkAuthorization(); // Check authorization on component mount
     fetchUnreadEmailCount();
-    fetchUserEmail(); // Fetch user email on component mount
-    const intervalId = setInterval(fetchUnreadEmailCount, 60000); // Refresh every minute
-    
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, [category, timeRange]); // Re-fetch when category or timeRange changes
+    const intervalId = setInterval(fetchUnreadEmailCount, 60000);
+
+    return () => clearInterval(intervalId);
+  }, [category, timeRange]);
+
+  const authorize = () => {
+    window.location.href = `/api/auth?redirect_uri=${encodeURIComponent(window.location.href)}`;
+  };
 
   return (
     <div className="gmail-api-container">
+      {!authorized && (
+        <button onClick={authorize} className="authorize-button">
+          Authorize Google Account
+        </button>
+      )}
       {userEmail && (
         <button disabled className="email-button">
           {`Account: ${userEmail}`}
         </button>
       )}
+      <h2 className="upgrade">
+        <a href="https://billing.stripe.com/p/login/test_cN27sJcJVd4QeiY4gg">Upgrade</a> to connect to more accounts
+      </h2>
       <div className="clear-container">
         <h1>Clear Your Inbox</h1>
         <h2>Clean up your unwanted emails and save storage</h2>
-        
+
         <div className="selectors-container">
           <div className="category-selector">
             <label htmlFor="category-select">Select Category: </label>
@@ -136,11 +158,11 @@ const GmailApi = () => {
         </div>
 
         <p>{loading ? '' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}</p>
-        
+
         <button onClick={markAsRead} disabled={loading || markingAsRead}>
           {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}
         </button>
-        
+
         <button onClick={deleteEmails} disabled={loading || deleting}>
           {deleting ? 'Moving to Trash...' : 'Delete Emails'}
         </button>

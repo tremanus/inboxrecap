@@ -12,6 +12,14 @@
     transition: background-color 0.3s ease;
   }
 
+.upgrade {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+    color: #444;
+    font-weight: 400;
+    text-align: center;
+  }
+
   .clear-container {
     font-family: Arial, sans-serif;
     padding: 20px;
