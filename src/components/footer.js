@@ -26,7 +26,7 @@ const Footer = () => (
         <a href="https://instagram.com/inboxrecap" target="_blank" rel="noopener noreferrer" className="social-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"></img></a>
         <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon">TW</a>
         <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon">LI</a>
-        <p className="personal">Made by <a href="https://tremanus.github.io">Biya</a></p>
+        <p className="personal">Made by <a href="https://tremanus.github.io" target="_blank" rel="noopener noreferrer">Biya</a></p>
       </div>
     </div>
 
