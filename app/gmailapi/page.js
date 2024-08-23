@@ -12,6 +12,9 @@ const GmailApi = () => {
   const [category, setCategory] = useState('all');
   const [timeRange, setTimeRange] = useState('all');
   const [authorized, setAuthorized] = useState(false);
+  const [error, setError] = useState(null);
+
+  const SCOPES = 'https://www.googleapis.com/auth/gmail.modify'; // Only the required scope
 
   const checkAuthorization = async () => {
     try {
@@ -24,17 +27,20 @@ const GmailApi = () => {
       }
     } catch (error) {
       console.error('Error checking authorization:', error);
+      setError('Failed to check authorization.');
     }
   };
 
   const fetchUnreadEmailCount = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`/api/markasread?category=${category}&timeRange=${timeRange}`);
       const data = await response.json();
       setUnreadCount(data.unreadCount || 0);
     } catch (error) {
       console.error('Error fetching unread emails:', error);
+      setError('Failed to fetch unread emails.');
     } finally {
       setLoading(false);
     }
@@ -47,11 +53,13 @@ const GmailApi = () => {
       setUserEmail(data.email || '');
     } catch (error) {
       console.error('Error fetching user email:', error);
+      setError('Failed to fetch user email.');
     }
   };
 
   const markAsRead = async () => {
     setMarkingAsRead(true);
+    setError(null);
     try {
       const response = await fetch('/api/mark-as-read', {
         method: 'POST',
@@ -65,9 +73,11 @@ const GmailApi = () => {
         fetchUnreadEmailCount();
       } else {
         console.error('Error marking emails as read:', data.error);
+        setError('Failed to mark emails as read.');
       }
     } catch (error) {
       console.error('Error marking emails as read:', error);
+      setError('Failed to mark emails as read.');
     } finally {
       setMarkingAsRead(false);
     }
@@ -75,6 +85,7 @@ const GmailApi = () => {
 
   const deleteEmails = async () => {
     setDeleting(true);
+    setError(null);
     try {
       const response = await fetch('/api/movetotrash', {
         method: 'POST',
@@ -88,9 +99,11 @@ const GmailApi = () => {
         fetchUnreadEmailCount();
       } else {
         console.error('Error deleting emails:', data.error);
+        setError('Failed to delete emails.');
       }
     } catch (error) {
       console.error('Error deleting emails:', error);
+      setError('Failed to delete emails.');
     } finally {
       setDeleting(false);
     }
@@ -106,7 +119,8 @@ const GmailApi = () => {
   }, [authorized, category, timeRange]);
 
   const authorize = () => {
-    window.location.href = `/api/auth-callback?redirect_uri=${encodeURIComponent(window.location.href)}`;
+    const oauthUrl = `/api/auth-callback?redirect_uri=${encodeURIComponent(window.location.href)}&scope=${encodeURIComponent(SCOPES)}`;
+    window.location.href = oauthUrl;
   };
 
   return (
@@ -157,7 +171,11 @@ const GmailApi = () => {
             </div>
           </div>
 
-          <p>{loading ? '' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}</p>
+          <p>
+            {loading ? 'Loading...' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}
+          </p>
+
+          {error && <p className="error-message">{error}</p>}
 
           <button onClick={markAsRead} disabled={loading || markingAsRead}>
             {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}

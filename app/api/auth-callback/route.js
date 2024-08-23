@@ -1,11 +1,15 @@
 // app/api/auth-callback/route.js
-import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
 
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
+
+// Define scopes required for your application
+const SCOPES = [
+  'https://www.googleapis.com/auth/gmail.modify' // Add this scope
+];
 
 async function loadSavedCredentialsIfExist() {
   try {
