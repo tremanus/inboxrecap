@@ -112,7 +112,7 @@ const GmailApi = () => {
   return (
     <div className="gmail-api-container">
       {!authorized && (
-        <button onClick={authorize} className="email-button">
+        <button onClick={authorize} className="authorize-button">
           Authorize Google Account
         </button>
       )}

@@ -12,6 +12,20 @@
     transition: background-color 0.3s ease;
   }
 
+  .authorize-button {
+    display: block;
+    padding: 20px 80px;
+    margin: auto;
+    color: #333;
+    background-color: #fff;
+    font-size: 2rem;
+    border: 1px solid black;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+
   .clear-container {
     font-family: Arial, sans-serif;
     padding: 20px;
