@@ -106,7 +106,7 @@ const GmailApi = () => {
   }, [authorized, category, timeRange]);
 
   const authorize = () => {
-    window.location.href = `/api/auth?redirect_uri=${encodeURIComponent(window.location.href)}`;
+    window.location.href = `/api/auth-callback?redirect_uri=${encodeURIComponent(window.location.href)}`;
   };
 
   return (
