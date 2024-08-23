@@ -142,7 +142,7 @@ const GmailApi = () => {
         </button>
         
         <button onClick={deleteEmails} disabled={loading || deleting}>
-          {deleting ? 'Deleting Emails...' : 'Delete Emails'}
+          {deleting ? 'Moving to Trash...' : 'Delete Emails'}
         </button>
       </div>
     </div>
