@@ -48,11 +48,11 @@ const EmailCounter = () => {
         </div>
       </div>
       <div 
-        className="down-arrow" 
-        style={{ opacity: hasEnded ? 1 : calculateOpacity() }}
-      >
-        ↓
-      </div>
+  className="down-arrow" 
+  style={{ opacity: hasEnded ? 1 : calculateOpacity() }}
+>
+  <img src="./arrow.png" alt="Down arrow" />
+</div>
       <div className="email-counter-header second-set" style={{ opacity: hasEnded ? 1 : calculateOpacity() }}>
         <div className="email-counter-item">
           <img src="/mail.png" alt="Mail" className="email-icon" />

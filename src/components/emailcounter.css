@@ -70,16 +70,26 @@
 
 .down-arrow {
     position: absolute;
-    top: 150px;
-    right: 235px;
-    font-size: 10rem;
-    color: green;
+    top: 195px;
+    right: 210px;
     opacity: 0;
-    transition: opacity 0.5s ease-in;
+    transition: opacity 0.6s ease-in;
+    width: 130px; /* Adjust width to make it skinnier */
+    height: 300px; /* Adjust height to make it smaller */
 }
+
+.down-arrow img {
+    width: 100%; /* Ensure the image scales with the div */
+    height: auto; /* Maintain aspect ratio */
+    transform: rotate(90deg) scaleX(1.6);
+    opacity: 0.8;
+    filter: saturate(300%) brightness(90%);
+}
+
 
 .second-set {
     margin-top: 140px;
+    margin-right: -10px;
     opacity: 0;
     transition: opacity 0.5s ease-in;
 }
