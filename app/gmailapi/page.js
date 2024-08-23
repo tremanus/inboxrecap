@@ -20,6 +20,7 @@ const GmailApi = () => {
       setAuthorized(data.authorized);
       if (data.authorized) {
         fetchUserEmail(); // Fetch user email if authorized
+        fetchUnreadEmailCount(); // Fetch unread email count if authorized
       }
     } catch (error) {
       console.error('Error checking authorization:', error);
@@ -97,11 +98,12 @@ const GmailApi = () => {
 
   useEffect(() => {
     checkAuthorization(); // Check authorization on component mount
-    fetchUnreadEmailCount();
-    const intervalId = setInterval(fetchUnreadEmailCount, 60000);
+    const intervalId = setInterval(() => {
+      if (authorized) fetchUnreadEmailCount();
+    }, 60000);
 
     return () => clearInterval(intervalId);
-  }, [category, timeRange]);
+  }, [authorized, category, timeRange]);
 
   const authorize = () => {
     window.location.href = `/api/auth?redirect_uri=${encodeURIComponent(window.location.href)}`;
@@ -119,51 +121,53 @@ const GmailApi = () => {
           {`Account: ${userEmail}`}
         </button>
       )}
-      <div className="clear-container">
-        <h1>Clear Your Inbox</h1>
-        <h2>Clean up your unwanted emails and save storage</h2>
+      {authorized && (
+        <div className="clear-container">
+          <h1>Clear Your Inbox</h1>
+          <h2>Clean up your unwanted emails and save storage</h2>
 
-        <div className="selectors-container">
-          <div className="category-selector">
-            <label htmlFor="category-select">Select Category: </label>
-            <select
-              id="category-select"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="all">All Mail</option>
-              <option value="promotions">Promotions</option>
-              <option value="social">Social</option>
-              <option value="updates">Updates</option>
-            </select>
+          <div className="selectors-container">
+            <div className="category-selector">
+              <label htmlFor="category-select">Select Category: </label>
+              <select
+                id="category-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="all">All Mail</option>
+                <option value="promotions">Promotions</option>
+                <option value="social">Social</option>
+                <option value="updates">Updates</option>
+              </select>
+            </div>
+
+            <div className="time-range-selector">
+              <label htmlFor="time-range-select">Select Time Range: </label>
+              <select
+                id="time-range-select"
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+              >
+                <option value="1d">Last 24 hours</option>
+                <option value="1w">Last 7 days</option>
+                <option value="1m">Last 30 days</option>
+                <option value="6m">Last 6 months</option>
+                <option value="all">All Time</option>
+              </select>
+            </div>
           </div>
 
-          <div className="time-range-selector">
-            <label htmlFor="time-range-select">Select Time Range: </label>
-            <select
-              id="time-range-select"
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-            >
-              <option value="1d">Last 24 hours</option>
-              <option value="1w">Last 7 days</option>
-              <option value="1m">Last 30 days</option>
-              <option value="6m">Last 6 months</option>
-              <option value="all">All Time</option>
-            </select>
-          </div>
+          <p>{loading ? '' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}</p>
+
+          <button onClick={markAsRead} disabled={loading || markingAsRead}>
+            {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}
+          </button>
+
+          <button onClick={deleteEmails} disabled={loading || deleting}>
+            {deleting ? 'Moving to Trash...' : 'Delete Emails'}
+          </button>
         </div>
-
-        <p>{loading ? '' : `You have ${unreadCount} unread ${category === 'all' ? '' : category} emails`}</p>
-
-        <button onClick={markAsRead} disabled={loading || markingAsRead}>
-          {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}
-        </button>
-
-        <button onClick={deleteEmails} disabled={loading || deleting}>
-          {deleting ? 'Moving to Trash...' : 'Delete Emails'}
-        </button>
-      </div>
+      )}
     </div>
   );
 };
