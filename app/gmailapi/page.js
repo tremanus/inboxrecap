@@ -119,9 +119,6 @@ const GmailApi = () => {
           {`Account: ${userEmail}`}
         </button>
       )}
-      <h2 className="upgrade">
-        <a href="https://billing.stripe.com/p/login/test_cN27sJcJVd4QeiY4gg">Upgrade</a> to connect to more accounts
-      </h2>
       <div className="clear-container">
         <h1>Clear Your Inbox</h1>
         <h2>Clean up your unwanted emails and save storage</h2>
