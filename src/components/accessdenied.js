@@ -6,7 +6,7 @@ function AccessDenied() {
   return (
     <div className="access-denied">
       <h1>Access Denied</h1>
-      <p>Sorry, you don't have permission to access this page. You must purchase a plan to gain access.</p>
+      <p>Sorry, you don't have permission. You must purchase a plan to gain access.</p>
       <Link to="/pricing" className="home-link">Purchase a Plan</Link>
     </div>
   );
