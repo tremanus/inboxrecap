@@ -66,9 +66,16 @@
     text-align: center;
   }
 
-  .clear-container p, .summarize-container p {
+  .clear-container p {
     text-align: center;
     font-size: 1.5rem;
+    margin-top: 25px;
+    margin-bottom: 15px;
+  }
+
+  .summarize-container p {
+    text-align: center;
+    font-size: 1rem;
     margin-top: 25px;
     margin-bottom: 15px;
   }

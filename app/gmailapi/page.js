@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import '../../src/components/gmailapi.css'; // Ensure this path is correct
+import DOMPurify from 'dompurify';
 
 const GmailApi = () => {
   const [unreadCount, setUnreadCount] = useState(null);
   const [loading, setLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [summarizing, setSummarizing] = useState(false); // New state for summarizing
-  const [summary, setSummary] = useState(null); // New state for the summary result
+  const [summarizing, setSummarizing] = useState(false);
+  const [summary, setSummary] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const [category, setCategory] = useState('all');
   const [timeRange, setTimeRange] = useState('all');
@@ -24,8 +25,8 @@ const GmailApi = () => {
       const data = await response.json();
       setAuthorized(data.authorized);
       if (data.authorized) {
-        fetchUserEmail(); // Fetch user email if authorized
-        fetchUnreadEmailCount(); // Fetch unread email count if authorized
+        fetchUserEmail();
+        fetchUnreadEmailCount();
       }
     } catch (error) {
       console.error('Error checking authorization:', error);
@@ -117,30 +118,17 @@ const GmailApi = () => {
     setError(null);
 
     try {
-      // Step 1: Fetch the latest unread email
-      const response = await fetch(`/api/reademail?category=${category}&timeRange=${timeRange}`);
-      const emailData = await response.json();
-
-      if (!emailData.email) {
-        setError('No unread emails found.');
-        return;
-      }
-
-      const emailContent = emailData.email.snippet || '';
-
-      // Step 2: Send the email content to the summarize endpoint
-      const summarizeResponse = await fetch('/api/summarize', {
+      const response = await fetch('/api/summarize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ emailContent }),
       });
 
-      const summarizeData = await summarizeResponse.json();
+      const data = await response.json();
 
-      if (summarizeData.summary) {
-        setSummary(summarizeData.summary);
+      if (data.summary) {
+        setSummary(data.summary);
       } else {
         setError('Failed to summarize email.');
       }
@@ -153,7 +141,7 @@ const GmailApi = () => {
   };
 
   useEffect(() => {
-    checkAuthorization(); // Check authorization on component mount
+    checkAuthorization();
     const intervalId = setInterval(() => {
       if (authorized) fetchUnreadEmailCount();
     }, 60000);
@@ -165,6 +153,13 @@ const GmailApi = () => {
     const oauthUrl = `/api/auth-callback?redirect_uri=${encodeURIComponent(window.location.href)}&scope=${encodeURIComponent(SCOPES)}`;
     window.location.href = oauthUrl;
   };
+
+  // Sanitize the summary content to allow links
+  const sanitizedSummary = DOMPurify.sanitize(summary, { 
+    USE_PROFILES: { html: true }, 
+    ALLOWED_TAGS: ['a'], 
+    ALLOWED_ATTR: ['href'] 
+  });
 
   return (
     <div className="gmail-api-container">
@@ -240,7 +235,7 @@ const GmailApi = () => {
             {summary && (
               <div className="summary-result">
                 <h3>Summary:</h3>
-                <p>{summary}</p>
+                <p dangerouslySetInnerHTML={{ __html: sanitizedSummary }} />
               </div>
             )}
           </div>
