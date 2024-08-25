@@ -7,7 +7,7 @@ const Footer = () => (
     <div className="footer-content">
       <div className="footer-section">
         <h3>Contact Us</h3>
-        <p>Email: <a href="mailto:inboxrecap@gmail.com">inboxrecap@gmail.com</a></p>
+        <p>Email: <a href="mailto:support@inboxrecap.com">support@inboxrecap.com</a></p>
         <p>Phone: (617) 454-4971</p>
       </div>
 

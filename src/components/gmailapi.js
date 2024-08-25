@@ -1,7 +1,7 @@
 'use client'; // Important for client-side rendering
 
 import React, { useEffect, useState } from 'react';
-import '../../src/components/gmailapi.css'; // Ensure this path is correct
+import './gmailapi.css'; // Ensure this path is correct
 import DOMPurify from 'dompurify';
 
 const GmailApi = () => {
@@ -220,7 +220,7 @@ const GmailApi = () => {
               {markingAsRead ? 'Marking as Read...' : 'Mark All as Read'}
             </button>
 
-            <button onClick={deleteEmails} disabled={loading || deleting}>
+            <button onClick={deleteEmails} disabled={loading || deleting} className="delete-button">
               {deleting ? 'Moving to Trash...' : 'Delete Emails'}
             </button>
           </div>

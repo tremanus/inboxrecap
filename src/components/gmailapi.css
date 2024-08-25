@@ -1,6 +1,6 @@
 .email-button {
     display: block;
-    padding: 10px 40px;
+    padding: 12px 40px;
     margin: 40px auto;
     margin-bottom: 10px;
     color: #333;
@@ -42,7 +42,7 @@
   .clear-container, .summarize-container {
     font-family: Arial, sans-serif;
     padding: 20px;
-    margin: 50px;
+    margin: 20px;
     max-width: 600px;
     min-width: 400px; /* Adjusted for better responsiveness */
     width: 90%; /* Use full width of the container */
@@ -118,3 +118,27 @@
     background-color: #d6d6d6;
     cursor: not-allowed;
   }
+
+  .delete-button {
+    padding: 10px !important;
+    margin: 5px 5px !important;
+    margin-left: 10px !important;
+    width: 45% !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: #fff !important;
+    background-color: #dc3545 !important; /* Red color */
+    font-size: 16px !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+}
+
+
+.delete-button:hover {
+    background-color: #c82333 !important; /* Darker red on hover */
+}
+
+.delete-button:disabled {
+    background-color: #d6d6d6 !important;
+    cursor: not-allowed !important;
+}

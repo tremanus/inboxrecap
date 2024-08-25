@@ -3,7 +3,6 @@ import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
-import { Parser } from 'htmlparser2';
 
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 
@@ -76,20 +75,6 @@ export async function POST(request) {
       return NextResponse.json({ error: 'No HTML content found in the email' }, { status: 404 });
     }
 
-    // Parse the HTML content to extract links
-    let links = [];
-    const parser = new Parser({
-      onopentag(name, attribs) {
-        if (name === 'a' && attribs.href) {
-          const linkText = attribs.title || attribs.href.split('/').pop().split('.')[0];
-          links.push(`[${linkText}](${attribs.href})`);
-        }
-      },
-    }, { decodeEntities: true });
-
-    parser.write(emailHtml);
-    parser.end();
-
     // Initialize OpenAI
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -99,7 +84,7 @@ export async function POST(request) {
     const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini', // Use the correct model name
         messages: [
-          { role: 'user', content: `Summarize this email in one concise sentence with important links: ${links.join(', ')}` }
+          { role: 'user', content: `Summarize this email in one concise sentence: ${emailHtml}` }
         ]
       });
 
