@@ -3,6 +3,8 @@ import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
+import formData from 'form-data';
+import Mailgun from 'mailgun.js';
 
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 
@@ -31,6 +33,26 @@ const extractHtmlFromParts = (parts) => {
   }
   return null;
 };
+
+// Initialize Mailgun client
+const mg = new Mailgun(formData).client({
+  username: 'api',
+  key: process.env.MAILGUN_API_KEY,
+});
+
+// Helper function to fetch user email from the API
+async function fetchUserEmail() {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/get-user-email`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user email');
+    }
+    const data = await response.json();
+    return data.email;
+  } catch (error) {
+    throw new Error(`Error fetching user email: ${error.message}`);
+  }
+}
 
 export async function POST(request) {
   try {
@@ -90,15 +112,22 @@ export async function POST(request) {
 
     const summary = completion.choices[0].message.content.trim();
 
-    // Return the summary along with sender and subject
-    const finalSummary = `
-      <p><strong>${sender} - ${subject}</strong></p>
-      <p>${summary}</p>
-    `;
+    // Get user email to send the summary
+    const userEmail = await fetchUserEmail();
 
-    return NextResponse.json({ summary: finalSummary });
+    // Send the email with the summary
+    const domain = 'inboxrecap.com'; // Replace with your Mailgun domain
+    await mg.messages.create(domain, {
+      from: 'InboxRecap <summary@inboxrecap.com>',
+      to: [userEmail],
+      subject: `Summary: ${subject}`,
+      text: summary,
+      html: `<p><strong>${sender} - ${subject}</strong></p><p>${summary}</p>`,
+    });
+
+    return NextResponse.json({ summary: `Summary sent to ${userEmail}` });
   } catch (error) {
-    console.error('Error summarizing email:', error);
+    console.error('Error summarizing and sending email:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import './gmailapi.css'; // Ensure this path is correct
-import DOMPurify from 'dompurify';
 
 const GmailApi = () => {
   const [unreadCount, setUnreadCount] = useState(null);
@@ -10,7 +9,7 @@ const GmailApi = () => {
   const [markingAsRead, setMarkingAsRead] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
-  const [summary, setSummary] = useState(null);
+  const [emailSent, setEmailSent] = useState(null); // Add this state
   const [userEmail, setUserEmail] = useState(null);
   const [category, setCategory] = useState('all');
   const [timeRange, setTimeRange] = useState('all');
@@ -114,7 +113,7 @@ const GmailApi = () => {
 
   const summarizeLatestEmail = async () => {
     setSummarizing(true);
-    setSummary(null);
+    setEmailSent(null); // Clear previous email sent status
     setError(null);
 
     try {
@@ -128,7 +127,7 @@ const GmailApi = () => {
       const data = await response.json();
 
       if (data.summary) {
-        setSummary(data.summary);
+        setEmailSent('Email sent successfully'); // Set success message
       } else {
         setError('Failed to summarize email.');
       }
@@ -153,13 +152,6 @@ const GmailApi = () => {
     const oauthUrl = `/api/auth-callback?redirect_uri=${encodeURIComponent(window.location.href)}&scope=${encodeURIComponent(SCOPES)}`;
     window.location.href = oauthUrl;
   };
-
-  // Sanitize the summary content to allow links
-  const sanitizedSummary = DOMPurify.sanitize(summary, { 
-    USE_PROFILES: { html: true }, 
-    ALLOWED_TAGS: ['a'], 
-    ALLOWED_ATTR: ['href'] 
-  });
 
   return (
     <div className="gmail-api-container">
@@ -232,10 +224,9 @@ const GmailApi = () => {
               {summarizing ? 'Summarizing...' : 'Summarize Latest Unread Email'}
             </button>
 
-            {summary && (
-              <div className="summary-result">
-                <h3>Summary:</h3>
-                <p dangerouslySetInnerHTML={{ __html: sanitizedSummary }} />
+            {emailSent && (
+              <div className="email-sent-result">
+                <h3>{emailSent}</h3>
               </div>
             )}
           </div>
