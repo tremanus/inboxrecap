@@ -17,20 +17,6 @@ const Dashboard = () => {
     }
   }, [isLoading, isAuthenticated, loginWithRedirect]);
 
-  const handleClick = () => {
-    // You might add functionality for editing the profile here
-    // This can be used to navigate to a profile edit page or show a modal
-    alert('Edit Profile functionality can be added here.');
-  };
-
-  const gmailClick = () => {
-    router.push('/gmailapi'); // Use router.push for navigation
-  };
-
-  const stripeClick = () => {
-    window.open('https://billing.stripe.com/p/login/test_cN27sJcJVd4QeiY4gg', '_blank', 'noopener,noreferrer');
-  };
-
   if (isLoading) {
     return <div className="loading">Loading...</div>;
   }

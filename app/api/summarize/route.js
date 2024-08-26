@@ -117,12 +117,27 @@ export async function POST(request) {
 
     // Send the email with the summary
     const domain = 'inboxrecap.com'; // Replace with your Mailgun domain
+
+    // Get the current date
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
     await mg.messages.create(domain, {
       from: 'InboxRecap <summary@inboxrecap.com>',
       to: [userEmail],
-      subject: `Summary: ${subject}`,
-      text: summary,
-      html: `<p><strong>${sender} - ${subject}</strong></p><p>${summary}</p>`,
+      subject: `${currentDate} - InboxRecap`,
+      text: `Hello!\n\nHere is your daily InboxRecap:\n\n${summary}\n\nBest,\n\nInboxRecap`,
+      html: `
+        <p>Hello!</p>
+        <p>Here is your daily InboxRecap:</p>
+        <p><strong>${sender} - ${subject}</strong></p>
+        <p>${summary}</p>
+        <p>Best,</p>
+        <p><a href="https://inboxrecap.com">InboxRecap</a></p>
+      `,
     });
 
     return NextResponse.json({ summary: `Summary sent to ${userEmail}` });
