@@ -1,69 +1,140 @@
-/* src/components/FAQ.css */
-.faqtitle {
-  font-size: 2rem;
-  max-width: 400px;
-  margin-left: 100px;
-  margin-top: 100px;
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@700&display=swap'); /* Replace with the correct font if Heather Bold is available */
+
+* {
+  box-sizing: border-box;
+}
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.faq {
-  padding: 20px;
-  max-width: 800px;
-  margin-left: auto; /* Pushes the container to the right */
-  margin-right: 20px; /* Ensures no extra margin on the right */
-  border-radius: 8px; /* Rounded corners for a softer look */
-  margin-top: -200px;
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #4d5974;
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  min-height: 100vh;
 }
 
+.container {
+  margin: 0 auto;
+  padding: 4rem;
+  width: 80%;
+  flex: 1; /* Make the container grow and take available space */
+}
 
-.faq h1 {
+.container h1 {
+  font-size: 3rem;
+  color: #111;
   text-align: center;
+  font-family: 'Heebo', sans-serif; /* Apply Heather Bold font */
+  font-weight: 700; /* Ensures the bold weight is applied */
   margin-bottom: 40px;
-  font-size: 2em; /* Larger font size for the main heading */
-  color: #333; /* Darker text color for better contrast */
 }
 
-.faq details {
-  margin-bottom: 20px; /* Space between FAQ items */
-  border: 1px solid #ddd; /* Light border around each FAQ item */
-  border-radius: 4px; /* Rounded corners for FAQ items */
-  background-color: #fff; /* White background for FAQ items */
+.container p {
+  text-align: center;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: -5px;
 }
 
-.faq summary {
+.accordion .accordion-item {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.accordion .accordion-item button[aria-expanded='true'] {
+  border-bottom: 1px solid #03b5d2;
+}
+
+.accordion button {
+  position: relative;
+  display: block;
+  text-align: left;
+  width: 100%;
+  padding: 1em 0;
+  color: #324c68;
+  font-size: 1.15rem;
+  font-weight: 400;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.accordion button:hover,
+.accordion button:focus {
   cursor: pointer;
-  padding: 15px;
-  font-size: 1.2em; /* Slightly larger font size for better readability */
-  font-weight: bold; /* Bold text for questions */
-  color: #007bff; /* Blue color for questions */
-  border-bottom: 1px solid #ddd; /* Separator between question and answer */
-  transition: background-color 0.3s, color 0.3s; /* Smooth transition for background and text color */
+  color: #0c7d8e;
 }
 
-.faq summary:hover {
-  background-color: #e9ecef; /* Light background on hover */
-  color: #0056b3; /* Darker blue on hover */
+.accordion button:hover::after,
+.accordion button:focus::after {
+  cursor: pointer;
+  color: #324c68;
+  border: 1px solid #3674b2;;
 }
 
-
-.faq p {
-  padding: 15px;
-  font-size: 1em;
-  line-height: 1.6; /* Improved readability with increased line height */
-  color: #555; /* Slightly lighter text color for answers */
+.accordion button .accordion-title {
+  padding: 1em 1.5em 1em 0;
 }
 
-.faq-item {
-  border-radius: 4px; /* Consistent with the border radius of FAQ items */
-  overflow: hidden; /* Ensure rounded corners are applied */
+.accordion button .icon {
+  display: inline-block;
+  position: absolute;
+  top: 18px;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  border: 1px solid;
+  border-radius: 22px;
 }
 
-@media (max-width: 600px) {
-  .faq summary {
-    font-size: 1em; /* Adjust font size for smaller screens */
-  }
+.accordion button .icon::before {
+  display: block;
+  position: absolute;
+  content: '';
+  top: 9px;
+  left: 5px;
+  width: 10px;
+  height: 2px;
+  background: currentColor;
+}
+.accordion button .icon::after {
+  display: block;
+  position: absolute;
+  content: '';
+  top: 5px;
+  left: 9px;
+  width: 2px;
+  height: 10px;
+  background: currentColor;
+}
 
-  .faq h1 {
-    font-size: 1.5em; /* Adjust heading size for smaller screens */
-  }
+.accordion button[aria-expanded='true'] {
+  color: #3674b2;
+}
+.accordion button[aria-expanded='true'] .icon::after {
+  width: 0;
+}
+.accordion button[aria-expanded='true'] + .accordion-content {
+  opacity: 1;
+  max-height: 9em;
+  transition: all 200ms linear;
+  will-change: opacity, max-height;
+}
+.accordion .accordion-content {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 200ms linear, max-height 200ms linear;
+  will-change: opacity, max-height;
+}
+.accordion .accordion-content p {
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  margin: 30px 0;
+  color: #666;
 }

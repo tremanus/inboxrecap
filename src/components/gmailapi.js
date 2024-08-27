@@ -37,7 +37,7 @@ const GmailApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/markasread?category=${category}&timeRange=${timeRange}`);
+      const response = await fetch(`/api/findunread?category=${category}&timeRange=${timeRange}`);
       const data = await response.json();
       setUnreadCount(data.unreadCount || 0);
     } catch (error) {
@@ -143,7 +143,7 @@ const GmailApi = () => {
     checkAuthorization();
     const intervalId = setInterval(() => {
       if (authorized) fetchUnreadEmailCount();
-    }, 60000);
+    }, 3600000);
 
     return () => clearInterval(intervalId);
   }, [authorized, category, timeRange]);
@@ -173,7 +173,7 @@ const GmailApi = () => {
 
             <div className="selectors-container">
               <div className="category-selector">
-                <label htmlFor="category-select">Select Category: </label>
+                <label htmlFor="category-select">Category:</label>
                 <select
                   id="category-select"
                   value={category}
@@ -187,7 +187,7 @@ const GmailApi = () => {
               </div>
 
               <div className="time-range-selector">
-                <label htmlFor="time-range-select">Select Time Range: </label>
+                <label htmlFor="time-range-select">Time Range:</label>
                 <select
                   id="time-range-select"
                   value={timeRange}
@@ -221,7 +221,7 @@ const GmailApi = () => {
             <h2>Mark emails as read and receive one sentence recaps of each</h2>
 
             <button onClick={summarizeLatestEmail} disabled={summarizing || loading}>
-              {summarizing ? 'Summarizing...' : 'Summarize Latest Unread Email'}
+              {summarizing ? 'Sending...' : 'Receive Daily Summary Email'}
             </button>
 
             {emailSent && (

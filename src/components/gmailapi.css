@@ -10,9 +10,9 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
+}
 
-  .authorize-button {
+.authorize-button {
     display: block;
     padding: 20px 80px;
     margin: 100px auto;
@@ -26,8 +26,8 @@
 }
 
 .authorize-button:hover {
-    background-color: #f0f0f0; /* Optional: Change background color on hover */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Horizontal offset, vertical offset, blur radius, color */
+    background-color: #f0f0f0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .main-container {
@@ -36,69 +36,87 @@
     align-items: flex-start;
     padding: 20px;
     flex-wrap: wrap;
-  }
+}
 
-
-  .clear-container, .summarize-container {
+.clear-container, .summarize-container {
     font-family: Arial, sans-serif;
     padding: 20px;
     margin: 20px;
     max-width: 600px;
-    min-width: 400px; /* Adjusted for better responsiveness */
-    width: 90%; /* Use full width of the container */
+    min-width: 400px;
+    width: 90%;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
+}
 
-  .clear-container h1, .summarize-container h1 {
+.clear-container h1, .summarize-container h1 {
     font-size: 2rem;
     margin-bottom: 20px;
     color: black;
     text-align: center;
-  }
-  
-  .clear-container h2, .summarize-container h2 {
+}
+
+.clear-container h2, .summarize-container h2 {
     font-size: 18px;
     margin-bottom: 30px;
     color: #3e3e3e;
     font-weight: 400;
     text-align: center;
-  }
+}
 
-  .clear-container p {
+.clear-container p {
     text-align: center;
     font-size: 1.5rem;
     margin-top: 25px;
     margin-bottom: 15px;
-  }
+}
 
-  .summarize-container p {
+.summarize-container p {
     text-align: center;
     font-size: 1rem;
     margin-top: 25px;
     margin-bottom: 15px;
-  }
+}
 
-  .selectors-container {
+.selectors-container {
     display: flex;
-    gap: 20px; /* Space between selectors */
-    margin-bottom: 10px; /* Space below the container */
-  }
-  
-  /* Individual selector styles */
-  .category-selector, .time-range-selector {
-    flex: 1; /* Allow both selectors to grow equally */
-  }
-  
-  /* Ensure labels are correctly spaced */
-  .category-selector label, .time-range-selector label {
-    margin-right: 10px; /* Space between the label and the select input */
-  }
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap; /* Prevents wrapping to a new line */
+}
 
-  .clear-container button {
+.category-selector, .time-range-selector {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 48%; /* Ensures the dropdowns fit on the same line */
+}
+
+.category-selector label, .time-range-selector label {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.category-selector select, .time-range-selector select {
     padding: 10px;
-    margin: 5px 5px; /* Margin for spacing */
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+    width: 100%; /* Makes the dropdowns fill the container */
+}
+
+.category-selector select:hover, .time-range-selector select:hover {
+    border-color: #007bff;
+}
+
+.clear-container button {
+    padding: 10px;
+    margin: 5px 5px;
     margin-left: 10px;
     width: 45%;
     border: none;
@@ -108,18 +126,41 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
-  
-  .clear-container button:hover {
+}
+
+.clear-container button:hover {
     background-color: #0056b3;
-  }
-  
-  .clear-container button:disabled {
+}
+
+.clear-container button:disabled {
     background-color: #d6d6d6;
     cursor: not-allowed;
-  }
+}
 
-  .delete-button {
+.summarize-container button {
+    padding: 10px;
+    display: block;
+    margin: 5px auto;
+    width: 90%;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #007bff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.summarize-container button:hover {
+    background-color: #0056b3;
+}
+
+.summarize-container button:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+.delete-button {
     padding: 10px !important;
     margin: 5px 5px !important;
     margin-left: 10px !important;
@@ -127,15 +168,14 @@
     border: none !important;
     border-radius: 4px !important;
     color: #fff !important;
-    background-color: #dc3545 !important; /* Red color */
+    background-color: #dc3545 !important;
     font-size: 16px !important;
     cursor: pointer !important;
     transition: background-color 0.3s ease !important;
 }
 
-
 .delete-button:hover {
-    background-color: #c82333 !important; /* Darker red on hover */
+    background-color: #c82333 !important;
 }
 
 .delete-button:disabled {
