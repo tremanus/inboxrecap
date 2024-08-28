@@ -129,6 +129,7 @@
     background-color: #fff;
     padding: 40px 20px;
     margin-top: 15px;
+    margin-bottom: 10px;
     width: 45%;
     text-align: center;
     border-radius: 10px;
@@ -174,6 +175,16 @@
     height: 40px;
   }
   
+  .next-summary {
+    position: absolute;
+    top: 450px;
+    left: 0;
+    margin-top: 10px; /* Space above the next-summary text */
+    font-size: 14px;
+    color: #777;
+    text-align: left;
+  }
+
   /* New styles for category selector */
   .selector-container {
     position: absolute;
@@ -309,3 +320,4 @@
     font-size: 16px;
     cursor: pointer;
 }
+  

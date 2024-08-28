@@ -31,8 +31,10 @@ const Test = () => {
   const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
   const [stats, setStats] = useState(null);
   const [unreadCount, setUnreadCount] = useState(null);
+  const [summaryTime, setSummaryTime] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSection, setSelectedSection] = useState('dashboard');
+
   const handleNavClick = (section) => {
     setSelectedSection(section);
   };
@@ -68,8 +70,26 @@ const Test = () => {
         .catch((error) => {
           console.error('Error fetching unread emails:', error);
         });
+
+      // Fetch summary time from user preferences
+      fetch(`/api/get-user-preferences?userEmail=${encodeURIComponent(user.email)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const timeString = data.summary_time; // Assuming your API returns { summary_time: string }
+          
+          // Convert to 12-hour format with AM/PM
+          const [hour, minute] = timeString.split(":");
+          const hours = parseInt(hour, 10);
+          const period = hours >= 12 ? "PM" : "AM";
+          const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+
+          setSummaryTime(`${formattedHours}:${minute} ${period}`);
+        })
+        .catch((error) => {
+          console.error('Error fetching summary time:', error);
+        });
     }
-  }, [isAuthenticated, user, selectedCategory]); // Include selectedCategory as a dependency
+  }, [isAuthenticated, user, selectedCategory]);
 
   if (isLoading) {
     return <div className="loading">Loading...</div>;
@@ -84,22 +104,22 @@ const Test = () => {
           stats?.emails_summarized || 0,
           stats?.emails_sent_to_trash || 0,
         ],
-        borderColor: '#36A2EB', // Line color
+        borderColor: '#36A2EB',
         backgroundColor: [
-          '#1041bd', // Color for 'Marked as Read'
-          '#109148', // Color for 'Summarized'
-          '#c42a1f', // Color for 'Sent to Trash'
+          '#1041bd',
+          '#109148',
+          '#c42a1f',
         ],
-        borderWidth: 2, // Line width
+        borderWidth: 2,
         pointBackgroundColor: [
-          '#1041bd', // Color for point 'Marked as Read'
-          '#109148', // Color for point 'Summarized'
-          '#c42a1f', // Color for point 'Sent to Trash'
+          '#1041bd',
+          '#109148',
+          '#c42a1f',
         ],
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
         pointRadius: 5,
-        tension: 0.1, // Smoothness of the line
+        tension: 0.1,
       },
     ],
   };
@@ -124,13 +144,13 @@ const Test = () => {
         },
       },
       title: {
-        display: false, // Disable default title
+        display: false,
       },
     },
     scales: {
       x: {
         grid: {
-          display: false, // Hide grid lines on x-axis
+          display: false,
         },
         ticks: {
           font: {
@@ -142,7 +162,7 @@ const Test = () => {
       },
       y: {
         grid: {
-          display: false, // Hide grid lines on y-axis
+          display: false,
         },
         ticks: {
           font: {
@@ -156,7 +176,7 @@ const Test = () => {
     },
     layout: {
       padding: {
-        top: 30, // Adjust padding as needed
+        top: 30,
         right: 0,
         bottom: 20,
         left: 0,
@@ -171,7 +191,6 @@ const Test = () => {
   return (
     isAuthenticated && (
       <div className="dashboard-container">
-        {/* Sidebar */}
         <div className="sidebar">
           <div className="profile-section">
             <img src={user?.picture || "/default-profile.png"} alt={user?.name} className="profile-picture" />
@@ -197,15 +216,12 @@ const Test = () => {
             <span className="dash-site-title">InboxRecap</span>
           </div>
         </div>
-        {/* Main Content */}
         <div className="main-content">
           <div className="header">
             <h1>{selectedSection.charAt(0).toUpperCase() + selectedSection.slice(1)}</h1>
           </div>
-          {/* Render the selected section */}
           {selectedSection === 'dashboard' && (
             <div className="content-container">
-              {/* Unread Emails Count */}
               <div className="unread-emails-box">
                 <div className="selector-container">
                   <select 
@@ -227,12 +243,10 @@ const Test = () => {
                   <img src="/gmaillogo.png" alt="Gmail Logo" className="gmail-logo" />
                 </div>
               </div>
-              {/* Line Graph */}
               <div className="line-graph-container">
                 <h2>Email Statistics</h2>
                 <Line data={data} options={options} />
               </div>
-              {/* Stats Section */}
               <div className="stats">
                 <div className="read-stat-box">
                   <h2>Emails Marked as Read</h2>
@@ -249,6 +263,7 @@ const Test = () => {
                   </div>
                 </div>
               </div>
+              <p className="next-summary">Next summary email at {summaryTime || 'Loading...'}</p>
             </div>
           )}
           {selectedSection === 'settings' && <Settings />}
@@ -256,7 +271,7 @@ const Test = () => {
         </div>
       </div>
     )
-  );  
+  );
 };
 
 export default Test;
