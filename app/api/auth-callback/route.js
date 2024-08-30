@@ -40,43 +40,49 @@ async function saveCredentials(client) {
 async function authorize(code) {
     let oauth2Client = await loadSavedCredentialsIfExist();
     if (oauth2Client) {
-      return oauth2Client;
+        return oauth2Client;
     }
-  
-    oauth2Client = new google.auth.OAuth2(
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
-    );
-  
-    try {
-      console.log('Attempting to get token using code:', code);
-      const { tokens } = await oauth2Client.getToken(code);
-      console.log('Tokens received:', tokens);
-      oauth2Client.setCredentials(tokens);
-      await saveCredentials(oauth2Client);
-      return oauth2Client;
-    } catch (error) {
-      console.error('Error retrieving access token:', error);
-      throw new Error('Failed to authorize with Google.');
-    }
-  }   
 
-  export async function GET(req) {
+    // Debugging environment variables
+    console.log('Client ID:', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+    console.log('Client Secret:', process.env.GOOGLE_CLIENT_SECRET);
+    console.log('Redirect URI:', `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`);
+
+    oauth2Client = new google.auth.OAuth2(
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
+    );
+
+    try {
+        console.log('Attempting to get token using code:', code);
+        const { tokens } = await oauth2Client.getToken(code);
+        console.log('Tokens received:', tokens);
+        oauth2Client.setCredentials(tokens);
+        await saveCredentials(oauth2Client);
+        return oauth2Client;
+    } catch (error) {
+        // Log the full error details
+        console.error('Error retrieving access token:', error.response ? error.response.data : error);
+        throw new Error('Failed to authorize with Google.');
+    }
+}   
+
+export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get('code');
-  
+
     console.log('Authorization Code:', code); // Debug log
-  
+
     if (!code) {
-      return NextResponse.json({ error: 'Authorization code not found' }, { status: 400 });
+        return NextResponse.json({ error: 'Authorization code not found' }, { status: 400 });
     }
-  
+
     try {
-      const oauth2Client = await authorize(code);
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
+        const oauth2Client = await authorize(code);
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
     } catch (error) {
-      console.error('Authorization Error:', error); // Debug log
-      return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Authorization Error:', error); // Debug log
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
-  }  
+}
