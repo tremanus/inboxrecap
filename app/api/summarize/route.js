@@ -1,12 +1,42 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import fs from 'fs';
+import path from 'path';
 import OpenAI from 'openai';
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { createClient } from '@supabase/supabase-js';
 
+const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+
 // Initialize Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Load OAuth credentials from token.json
+async function loadSavedCredentialsIfExist() {
+  try {
+    const content = await fs.promises.readFile(TOKEN_PATH);
+    const credentials = JSON.parse(content);
+    return google.auth.fromJSON(credentials);
+  } catch (err) {
+    console.error('Error loading credentials:', err);
+    return null;
+  }
+}
+
+// Function to extract HTML content from email parts
+const extractHtmlFromParts = (parts) => {
+  if (!Array.isArray(parts)) return null;
+  for (const part of parts) {
+    if (part.mimeType === 'text/html') {
+      return Buffer.from(part.body.data, 'base64').toString('utf-8');
+    } else if (part.parts) {
+      const html = extractHtmlFromParts(part.parts);
+      if (html) return html;
+    }
+  }
+  return null;
+};
 
 // Initialize Mailgun client
 const mg = new Mailgun(formData).client({
@@ -28,35 +58,13 @@ async function fetchUserEmail() {
   }
 }
 
-// Function to extract HTML content from email parts
-const extractHtmlFromParts = (parts) => {
-  if (!Array.isArray(parts)) return null;
-  for (const part of parts) {
-    if (part.mimeType === 'text/html') {
-      return Buffer.from(part.body.data, 'base64').toString('utf-8');
-    } else if (part.parts) {
-      const html = extractHtmlFromParts(part.parts);
-      if (html) return html;
-    }
-  }
-  return null;
-}
-
 export async function POST(request) {
   try {
-    // Initialize OAuth2 client with environment variables
-    const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-    );
+    const oauth2Client = await loadSavedCredentialsIfExist();
 
-    oauth2Client.setCredentials({
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-      access_token: process.env.GOOGLE_ACCESS_TOKEN,
-      token_type: process.env.GOOGLE_TOKEN_TYPE,
-      expiry_date: parseInt(process.env.GOOGLE_EXPIRY_DATE, 10),
-    });
+    if (!oauth2Client) {
+      return NextResponse.json({ error: 'No credentials found' }, { status: 401 });
+    }
 
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
@@ -134,15 +142,16 @@ export async function POST(request) {
         const summary = completion.choices[0].message.content.trim();
 
         // Append summary to the email summaries string with Mark as Unread and Reply buttons
-        emailSummaries += 
-          `<div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin: 20px; margin-bottom: 40px">
+        emailSummaries += `
+          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin: 20px; margin-bottom: 40px">
             <p style="font-size: 16px; color: #333;"><strong>From:</strong> ${sender}</p>
             <p style="font-size: 16px; color: #333;"><strong>Subject:</strong> ${subject}</p>
             <p style="font-size: 16px; color: #333; margin-top: 20px;">${summary}</p>
             <div style="margin-top: 20px;">
               <a href="https://mail.google.com/mail/u/0/#inbox/${messageId}" style="text-decoration: none; padding: 10px 20px; background-color: #007bff; color: white; border-radius: 5px; display: inline-block; margin: 0 auto; text-align: center;">Reply</a>
             </div>
-          </div>`;
+          </div>
+        `;
 
         // Mark the email as read
         await gmail.users.messages.modify({
@@ -155,22 +164,22 @@ export async function POST(request) {
 
         // Update Supabase email statistics
         const { data, error } = await supabase
-          .from('email_statistics')
-          .update({
-            emails_summarized: userStats.emails_summarized + 1,
-            emails_marked_as_read: userStats.emails_marked_as_read + 1,
-          })
-          .eq('user_id', userEmail)
-          .single();
+  .from('email_statistics')
+  .update({
+    emails_summarized: userStats.emails_summarized + 1,
+    emails_marked_as_read: userStats.emails_marked_as_read + 1,
+  })
+  .eq('user_id', userEmail)
+  .single();
 
-        if (error) {
-          console.error('Error updating email statistics:', error);
-          return NextResponse.json({ error: 'Failed to update email statistics' }, { status: 500 });
-        }
+if (error) {
+  console.error('Error updating email statistics:', error);
+  return NextResponse.json({ error: 'Failed to update email statistics' }, { status: 500 });
+}
 
-        // Update userStats to reflect the changes
-        userStats.emails_summarized += 1;
-        userStats.emails_marked_as_read += 1;
+// Update userStats to reflect the changes
+userStats.emails_summarized += 1;
+userStats.emails_marked_as_read += 1;
       }
     }
 
