@@ -178,13 +178,49 @@
   .next-summary {
     position: absolute;
     top: 450px;
-    left: 0;
-    margin-top: 10px; /* Space above the next-summary text */
+    left: 70px;
+    margin-top: 10px;
     font-size: 14px;
     color: #777;
     text-align: left;
+    font-family: 'Roboto', sans-serif;
   }
-
+  
+  .next-summary h3 {
+    font-size: 16px;
+    font-weight: 400;
+    color: #555;
+  }
+  
+  .countdown-timer {
+    position: relative;
+    width: 400px; /* Width of the progress bar */
+    height: 10px; /* Height of the progress bar */
+    margin-top: 15px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background-color: #270e5a;
+    transition: width 0.5s ease-in-out;
+  }
+  
+  .time-remaining {
+    position: absolute;
+    font-size: 1rem;
+    bottom: 25px;
+    left: 330px;
+    color: #333;
+  }
+  
   /* New styles for category selector */
   .selector-container {
     position: absolute;

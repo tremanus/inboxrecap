@@ -1,10 +1,10 @@
 "use client";
-
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth0 } from '@auth0/auth0-react';
 import Settings from './settings';
 import Billing from './billing';
+import Countdown from './countdown';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -34,6 +34,7 @@ const Test = () => {
   const [summaryTime, setSummaryTime] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSection, setSelectedSection] = useState('dashboard');
+  const [userEmail, setUserEmail] = useState(null);
 
   const handleNavClick = (section) => {
     setSelectedSection(section);
@@ -50,9 +51,23 @@ const Test = () => {
   }, [isLoading, isAuthenticated, loginWithRedirect]);
 
   useEffect(() => {
-    if (isAuthenticated && user?.email) {
+    if (isAuthenticated) {
+      // Fetch user email from the custom endpoint
+      fetch('/api/get-user-email')
+        .then((response) => response.json())
+        .then((data) => {
+          setUserEmail(data.email);
+        })
+        .catch((error) => {
+          console.error('Error fetching user email:', error);
+        });
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (userEmail) {
       // Fetch user statistics
-      fetch(`/api/get-user-statistics?userEmail=${encodeURIComponent(user.email)}`)
+      fetch(`/api/get-user-statistics?userEmail=${encodeURIComponent(userEmail)}`)
         .then((response) => response.json())
         .then((data) => {
           setStats(data);
@@ -62,7 +77,7 @@ const Test = () => {
         });
 
       // Fetch unread emails count based on selected category
-      fetch(`/api/findunread?userEmail=${encodeURIComponent(user.email)}&category=${selectedCategory}`)
+      fetch(`/api/findunread?userEmail=${encodeURIComponent(userEmail)}&category=${selectedCategory}`)
         .then((response) => response.json())
         .then((data) => {
           setUnreadCount(data.unreadCount); // Assuming your API returns { unreadCount: number }
@@ -72,7 +87,7 @@ const Test = () => {
         });
 
       // Fetch summary time from user preferences
-      fetch(`/api/get-user-preferences?userEmail=${encodeURIComponent(user.email)}`)
+      fetch(`/api/get-user-preferences?userEmail=${encodeURIComponent(userEmail)}`)
         .then((response) => response.json())
         .then((data) => {
           const timeString = data.summary_time; // Assuming your API returns { summary_time: string }
@@ -89,7 +104,7 @@ const Test = () => {
           console.error('Error fetching summary time:', error);
         });
     }
-  }, [isAuthenticated, user, selectedCategory]);
+  }, [userEmail, selectedCategory]);
 
   if (isLoading) {
     return <div className="loading">Loading...</div>;
@@ -239,7 +254,7 @@ const Test = () => {
                 <h2>Total Unread Emails</h2>
                 <p>{unreadCount !== null ? unreadCount : 'Loading...'}</p>
                 <div className="bottom-elements">
-                  <span className="user-email">{user?.email}</span>
+                  <span className="user-email">{userEmail}</span>
                   <img src="/gmaillogo.png" alt="Gmail Logo" className="gmail-logo" />
                 </div>
               </div>
@@ -263,7 +278,11 @@ const Test = () => {
                   </div>
                 </div>
               </div>
-              <p className="next-summary">Next summary email at {summaryTime || 'Loading...'}</p>
+              <div className="next-summary">
+  <h3>Next Summary in:</h3>
+  {summaryTime !== null ? <Countdown summaryTime={summaryTime} /> : "Loading..."}
+</div>
+
             </div>
           )}
           {selectedSection === 'settings' && <Settings />}

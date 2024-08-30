@@ -5,8 +5,12 @@ import path from 'path';
 import OpenAI from 'openai';
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
+import { createClient } from '@supabase/supabase-js';
 
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+
+// Initialize Supabase client
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // Load OAuth credentials from token.json
 async function loadSavedCredentialsIfExist() {
@@ -81,6 +85,27 @@ export async function POST(request) {
 
     let emailSummaries = '';
 
+    const userEmail = await fetchUserEmail();
+
+    // Fetch or create the user's email statistics entry
+    let { data: userStats, error: fetchError } = await supabase
+      .from('email_statistics')
+      .select('*')
+      .eq('user_id', userEmail)
+      .single();
+
+    if (fetchError && fetchError.code === 'PGRST116') { // User not found, create a new entry
+      const { data, error: insertError } = await supabase
+        .from('email_statistics')
+        .insert([{ user_id: userEmail, emails_summarized: 0, emails_marked_as_read: 0 }])
+        .single();
+      if (insertError) {
+        console.error('Error creating user stats:', insertError);
+        return NextResponse.json({ error: 'Failed to create user statistics' }, { status: 500 });
+      }
+      userStats = data;
+    }
+
     for (const messageData of response.data.messages) {
       const messageId = messageData.id;
 
@@ -136,11 +161,27 @@ export async function POST(request) {
             removeLabelIds: ['UNREAD'],
           },
         });
+
+        // Update Supabase email statistics
+        const { data, error } = await supabase
+  .from('email_statistics')
+  .update({
+    emails_summarized: userStats.emails_summarized + 1,
+    emails_marked_as_read: userStats.emails_marked_as_read + 1,
+  })
+  .eq('user_id', userEmail)
+  .single();
+
+if (error) {
+  console.error('Error updating email statistics:', error);
+  return NextResponse.json({ error: 'Failed to update email statistics' }, { status: 500 });
+}
+
+// Update userStats to reflect the changes
+userStats.emails_summarized += 1;
+userStats.emails_marked_as_read += 1;
       }
     }
-
-    // Get user email to send the summary
-    const userEmail = await fetchUserEmail();
 
     // Get the current date
     const currentDate = now.toLocaleDateString('en-US', {
