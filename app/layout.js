@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from '../src/components/header';
 import Footer from "../src/components/footer";
 import AuthProvider from '../src/providers/AuthProvider'; // Import your AuthProvider
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <AuthProvider>
+          <Analytics />
           <Header />
           <main>{children}</main>
           <Footer />
