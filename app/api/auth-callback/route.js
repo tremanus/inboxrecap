@@ -56,18 +56,21 @@ async function authorize(code) {
     return oauth2Client;
   }  
 
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const code = searchParams.get('code');
-
-  if (!code) {
-    return NextResponse.json({ error: 'Authorization code not found' }, { status: 400 });
-  }
-
-  try {
-    const oauth2Client = await authorize(code);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+  export async function GET(req) {
+    const { searchParams } = new URL(req.url);
+    const code = searchParams.get('code');
+  
+    console.log('Authorization Code:', code); // Debug log
+  
+    if (!code) {
+      return NextResponse.json({ error: 'Authorization code not found' }, { status: 400 });
+    }
+  
+    try {
+      const oauth2Client = await authorize(code);
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
+    } catch (error) {
+      console.error('Authorization Error:', error); // Debug log
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }  
