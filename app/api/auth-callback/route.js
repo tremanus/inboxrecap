@@ -61,7 +61,7 @@ export async function GET(req) {
 
   try {
     const oauth2Client = await authorize(code);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/gmailapi`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
