@@ -1,88 +1,77 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
 // Define scopes required for your application
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.modify' // Add this scope
 ];
 
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.promises.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    return null;
+// Load credentials from environment variables
+function loadSavedCredentialsIfExist() {
+  if (process.env.GOOGLE_REFRESH_TOKEN) {
+    return new google.auth.OAuth2(
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
+    );
   }
+  return null;
 }
 
-async function saveCredentials(client) {
-  const content = await fs.promises.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
-  const key = keys.installed || keys.web;
-  const payload = JSON.stringify({
-    type: 'authorized_user',
-    client_id: key.client_id,
-    client_secret: key.client_secret,
-    refresh_token: client.credentials.refresh_token,
-    access_token: client.credentials.access_token,
-    token_type: client.credentials.token_type,
-    expiry_date: client.credentials.expiry_date,
-  });
-  await fs.promises.writeFile(TOKEN_PATH, payload);
+// Save credentials to environment variables
+function saveCredentials(tokens) {
+  process.env.GOOGLE_REFRESH_TOKEN = tokens.refresh_token;
+  process.env.GOOGLE_ACCESS_TOKEN = tokens.access_token;
+  process.env.GOOGLE_TOKEN_TYPE = tokens.token_type;
+  process.env.GOOGLE_EXPIRY_DATE = tokens.expiry_date;
 }
 
 async function authorize(code) {
-    let oauth2Client = await loadSavedCredentialsIfExist();
-    if (oauth2Client) {
-        return oauth2Client;
-    }
+  let oauth2Client = loadSavedCredentialsIfExist();
+  if (oauth2Client) {
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      access_token: process.env.GOOGLE_ACCESS_TOKEN,
+      token_type: process.env.GOOGLE_TOKEN_TYPE,
+      expiry_date: parseInt(process.env.GOOGLE_EXPIRY_DATE, 10),
+    });
+    return oauth2Client;
+  }
 
-    // Debugging environment variables
-    console.log('Client ID:', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
-    console.log('Client Secret:', process.env.GOOGLE_CLIENT_SECRET);
-    console.log('Redirect URI:', `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`);
+  oauth2Client = new google.auth.OAuth2(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
+  );
 
-    oauth2Client = new google.auth.OAuth2(
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
-    );
-
-    try {
-        console.log('Attempting to get token using code:', code);
-        const { tokens } = await oauth2Client.getToken(code);
-        console.log('Tokens received:', tokens);
-        oauth2Client.setCredentials(tokens);
-        await saveCredentials(oauth2Client);
-        return oauth2Client;
-    } catch (error) {
-        // Log the full error details
-        console.error('Error retrieving access token:', error.response ? error.response.data : error);
-        throw new Error('Failed to authorize with Google.');
-    }
-}   
+  try {
+    console.log('Attempting to get token using code:', code);
+    const { tokens } = await oauth2Client.getToken(code);
+    console.log('Tokens received:', tokens);
+    oauth2Client.setCredentials(tokens);
+    saveCredentials(tokens);
+    return oauth2Client;
+  } catch (error) {
+    console.error('Error retrieving access token:', error.response ? error.response.data : error.message);
+    throw new Error('Failed to authorize with Google.');
+  }
+}
 
 export async function GET(req) {
-    const { searchParams } = new URL(req.url);
-    const code = searchParams.get('code');
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get('code');
 
-    console.log('Authorization Code:', code); // Debug log
+  console.log('Authorization Code:', code); // Debug log
 
-    if (!code) {
-        return NextResponse.json({ error: 'Authorization code not found' }, { status: 400 });
-    }
+  if (!code) {
+    return NextResponse.json({ error: 'Authorization code not found' }, { status: 400 });
+  }
 
-    try {
-        const oauth2Client = await authorize(code);
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
-    } catch (error) {
-        console.error('Authorization Error:', error); // Debug log
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+  try {
+    const oauth2Client = await authorize(code);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
+  } catch (error) {
+    console.error('Authorization Error:', error); // Debug log
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
