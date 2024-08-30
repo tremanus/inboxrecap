@@ -149,9 +149,13 @@ const GmailApi = () => {
   }, [authorized, category, timeRange]);
 
   const authorize = () => {
-    const oauthUrl = `/api/auth-callback?redirect_uri=${encodeURIComponent(window.location.href)}&scope=${encodeURIComponent(SCOPES)}`;
-    window.location.href = oauthUrl;
-  };
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`;  // Ensure this matches the callback URL registered in Google Developer Console
+    const scope = SCOPES;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
+  
+    window.location.href = authUrl; // Redirect to Google's OAuth 2.0 server
+  };  
 
   return (
     <div className="gmail-api-container">
