@@ -38,18 +38,23 @@ async function saveCredentials(client) {
 }
 
 async function authorize(code) {
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
-  );
-
-  const { tokens } = await oauth2Client.getToken(code);
-  oauth2Client.setCredentials(tokens);
-  await saveCredentials(oauth2Client);
-
-  return oauth2Client;
-}
+    let oauth2Client = await loadSavedCredentialsIfExist();
+    if (oauth2Client) {
+      return oauth2Client;
+    }
+  
+    oauth2Client = new google.auth.OAuth2(
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
+    );
+  
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+    await saveCredentials(oauth2Client);
+  
+    return oauth2Client;
+  }  
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
