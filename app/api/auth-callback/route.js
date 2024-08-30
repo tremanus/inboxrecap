@@ -49,12 +49,18 @@ async function authorize(code) {
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`
     );
   
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-    await saveCredentials(oauth2Client);
-  
-    return oauth2Client;
-  }  
+    try {
+      console.log('Attempting to get token using code:', code);
+      const { tokens } = await oauth2Client.getToken(code);
+      console.log('Tokens received:', tokens);
+      oauth2Client.setCredentials(tokens);
+      await saveCredentials(oauth2Client);
+      return oauth2Client;
+    } catch (error) {
+      console.error('Error retrieving access token:', error);
+      throw new Error('Failed to authorize with Google.');
+    }
+  }   
 
   export async function GET(req) {
     const { searchParams } = new URL(req.url);
