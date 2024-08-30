@@ -1,26 +1,33 @@
 // app/api/markasread/route.js
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import fs from 'fs';
-import path from 'path';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path based on your project structure
 
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.promises.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
+async function getOAuthClientFromSession(session) {
+  if (!session || !session.user || !session.user.accessToken) {
+    console.error('No session or access token found');
     return null;
   }
+
+  const oauth2Client = new google.auth.OAuth2();
+  oauth2Client.setCredentials({
+    access_token: session.user.accessToken,
+  });
+
+  return oauth2Client;
 }
 
 export async function GET(request) {
   try {
-    const oauth2Client = await loadSavedCredentialsIfExist();
+    // Get session
+    const session = await getServerSession(authOptions);
+
+    // Get OAuth client from session
+    const oauth2Client = await getOAuthClientFromSession(session);
     
     if (!oauth2Client) {
+      console.error('OAuth client not created');
       return NextResponse.json({ error: 'No credentials found' }, { status: 401 });
     }
 
@@ -52,8 +59,6 @@ export async function GET(request) {
     } else if (timeRange === '6m') {
       query += ' newer_than:180d';
     }
-
-    console.log('Query:', query); // Log the query
 
     do {
       const response = await gmail.users.messages.list({

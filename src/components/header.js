@@ -1,36 +1,32 @@
-// src/components/Header.js
-"use client"; // Add this directive to make the component a client component
+"use client"; // This directive makes the component a client component
 
 import React from 'react';
 import Link from 'next/link'; // Use Next.js's Link component
-import { useAuth0 } from '@auth0/auth0-react'; // Import Auth0 hooks
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation'; // Import the useRouter hook
 
 import './header.css'; // Ensure CSS is correctly imported
 
 const Header = () => {
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0(); // Get Auth0 hooks
+  const { data: session } = useSession(); // Get the session data
+  const router = useRouter(); // Initialize the useRouter hook
 
   const handleDashboardClick = () => {
     console.log('Dashboard button clicked');
-    window.location.href = '/dashboard'; // Redirect to dashboard
+    router.push('/dashboard'); // Redirect to the dashboard
   };
 
   const handlePricingClick = () => {
     console.log('Pricing button clicked');
-    window.location.href = '/pricing'; // Redirect to pricing
+    router.push('/pricing'); // Redirect to pricing
   };
 
-  const handleAuthClick = () => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`;  // Ensure this matches the callback URL registered in Google Developer Console
-    const scope = 'https://www.googleapis.com/auth/gmail.modify';
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
-
-    window.location.href = authUrl; // Redirect to Google's OAuth 2.0 server
+  const handleSignIn = () => {
+    signIn("google", { callbackUrl: '/dashboard' }); // Redirect to dashboard on login
   };
 
-  const handleLogin = () => {
-    loginWithRedirect({ redirectUri: `${window.location.origin}/dashboard` });
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/' }); // Redirect to homepage on logout
   };
 
   return (
@@ -45,14 +41,14 @@ const Header = () => {
           <li><Link href="/pricing">Pricing</Link></li>
           <li><Link href="/faq">FAQ</Link></li>
         </ul>
-        {isAuthenticated ? (
+        {session ? (
           <>
-            <button className="login-button" onClick={() => logout({ returnTo: window.location.origin })}>Logout</button>
+            <button className="login-button" onClick={handleSignOut}>Logout</button>
             <button className="signup-button" onClick={handleDashboardClick}>Dashboard</button>
           </>
         ) : (
           <>
-            <button className="login-button" onClick={handleLogin}>Login</button>
+            <button className="login-button" onClick={handleSignIn}>Login</button>
             <button className="signup-button" onClick={handlePricingClick}>Try For Free</button>
           </>
         )}

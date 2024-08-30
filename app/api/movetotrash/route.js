@@ -1,27 +1,32 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import fs from 'fs';
-import path from 'path';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path based on your project structure
 import { createClient } from '@supabase/supabase-js';
-
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 
 // Initialize Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.promises.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
+async function getOAuthClientFromSession(session) {
+  if (!session || !session.user || !session.user.accessToken) {
     return null;
   }
+
+  const oauth2Client = new google.auth.OAuth2();
+  oauth2Client.setCredentials({
+    access_token: session.user.accessToken,
+  });
+
+  return oauth2Client;
 }
 
 export async function POST(request) {
   try {
-    const oauth2Client = await loadSavedCredentialsIfExist();
+    // Get session
+    const session = await getServerSession(authOptions);
+
+    // Get OAuth client from session
+    const oauth2Client = await getOAuthClientFromSession(session);
     
     if (!oauth2Client) {
       return NextResponse.json({ error: 'No credentials found' }, { status: 401 });

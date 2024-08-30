@@ -1,22 +1,12 @@
 "use client";
 
-import React from 'react';
-import { Auth0Provider } from '@auth0/auth0-react';
+import { SessionProvider } from "next-auth/react";
 
-const AuthProvider = ({ children }) => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  const redirectUri = isProduction 
-    ? "https:www.inboxrecap.com" 
-    : "http://localhost:3000";
-
+const AuthProvider = ({ children, session }) => {
   return (
-    <Auth0Provider
-      domain="dev-ftmr2hfwyqzsehxk.us.auth0.com"
-      clientId="rXWK9L5O3pNeFYogyOdsPvOFrn2x6jkI"
-      authorizationParams={{ redirect_uri: redirectUri }}
-    >
+    <SessionProvider session={session}>
       {children}
-    </Auth0Provider>
+    </SessionProvider>
   );
 };
 

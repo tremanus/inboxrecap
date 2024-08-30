@@ -1,28 +1,20 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import fs from 'fs';
-import path from 'path';
 import OpenAI from 'openai';
-import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { createClient } from '@supabase/supabase-js';
-
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path based on your project structure
+import formData from 'form-data';
 
 // Initialize Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// Load OAuth credentials from token.json
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.promises.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    console.error('Error loading credentials:', err);
-    return null;
-  }
-}
+// Initialize Mailgun client
+const mg = new Mailgun(formData).client({
+  username: 'api',
+  key: process.env.MAILGUN_API_KEY,
+});
 
 // Function to extract HTML content from email parts
 const extractHtmlFromParts = (parts) => {
@@ -38,31 +30,27 @@ const extractHtmlFromParts = (parts) => {
   return null;
 };
 
-// Initialize Mailgun client
-const mg = new Mailgun(formData).client({
-  username: 'api',
-  key: process.env.MAILGUN_API_KEY,
-});
-
-// Helper function to fetch user email from the API
-async function fetchUserEmail() {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/get-user-email`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch user email');
-    }
-    const data = await response.json();
-    return data.email;
-  } catch (error) {
-    throw new Error(`Error fetching user email: ${error.message}`);
+// Function to get OAuth2 client and userEmail from session
+async function getOAuthClientFromSession(session) {
+  if (!session || !session.user || !session.user.email || !session.user.accessToken) {
+    return null;
   }
+  const { email: userEmail, accessToken } = session.user;
+  const oauth2Client = new google.auth.OAuth2();
+  oauth2Client.setCredentials({ access_token: accessToken });
+
+  return { oauth2Client, userEmail };
 }
 
 export async function POST(request) {
   try {
-    const oauth2Client = await loadSavedCredentialsIfExist();
+    // Get session
+    const session = await getServerSession(authOptions);
 
-    if (!oauth2Client) {
+    // Get OAuth client and userEmail from session
+    const { oauth2Client, userEmail } = await getOAuthClientFromSession(session);
+    
+    if (!oauth2Client || !userEmail) {
       return NextResponse.json({ error: 'No credentials found' }, { status: 401 });
     }
 
@@ -84,8 +72,6 @@ export async function POST(request) {
     }
 
     let emailSummaries = '';
-
-    const userEmail = await fetchUserEmail();
 
     // Fetch or create the user's email statistics entry
     let { data: userStats, error: fetchError } = await supabase
@@ -164,22 +150,22 @@ export async function POST(request) {
 
         // Update Supabase email statistics
         const { data, error } = await supabase
-  .from('email_statistics')
-  .update({
-    emails_summarized: userStats.emails_summarized + 1,
-    emails_marked_as_read: userStats.emails_marked_as_read + 1,
-  })
-  .eq('user_id', userEmail)
-  .single();
+          .from('email_statistics')
+          .update({
+            emails_summarized: userStats.emails_summarized + 1,
+            emails_marked_as_read: userStats.emails_marked_as_read + 1,
+          })
+          .eq('user_id', userEmail)
+          .single();
 
-if (error) {
-  console.error('Error updating email statistics:', error);
-  return NextResponse.json({ error: 'Failed to update email statistics' }, { status: 500 });
-}
+        if (error) {
+          console.error('Error updating email statistics:', error);
+          return NextResponse.json({ error: 'Failed to update email statistics' }, { status: 500 });
+        }
 
-// Update userStats to reflect the changes
-userStats.emails_summarized += 1;
-userStats.emails_marked_as_read += 1;
+        // Update userStats to reflect the changes
+        userStats.emails_summarized += 1;
+        userStats.emails_marked_as_read += 1;
       }
     }
 

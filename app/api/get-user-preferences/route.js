@@ -1,17 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path based on your project structure
 
 // Initialize the Supabase client with your credentials
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const userEmail = searchParams.get('userEmail'); // Extract userEmail from query params
-
-  if (!userEmail) {
-    return new Response(JSON.stringify({ error: 'User email is required' }), { status: 400 });
-  }
-
   try {
+    // Get the session
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.email) {
+      return new Response(JSON.stringify({ error: 'User email is required' }), { status: 401 });
+    }
+
+    const userEmail = session.user.email; // Extract user email from the session
+
     // Fetch summary_time and categories from the user_preferences table
     const { data, error } = await supabase
       .from('user_preferences')

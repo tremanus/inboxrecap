@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useSession, signIn } from 'next-auth/react';
 import Settings from './settings';
 import Billing from './billing';
 import Countdown from './countdown';
@@ -28,7 +28,9 @@ ChartJS.register(
 import './designtest.css';
 
 const Test = () => {
-  const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  const isLoading = status === "loading";
   const [stats, setStats] = useState(null);
   const [unreadCount, setUnreadCount] = useState(null);
   const [summaryTime, setSummaryTime] = useState(null);
@@ -46,23 +48,15 @@ const Test = () => {
     document.title = "Dashboard | InboxRecap";
     
     if (!isLoading && !isAuthenticated) {
-      loginWithRedirect();
+      signIn(); // Redirects to the sign-in page
     }
-  }, [isLoading, isAuthenticated, loginWithRedirect]);
+  }, [isLoading, isAuthenticated]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      // Fetch user email from the custom endpoint
-      fetch('/api/get-user-email')
-        .then((response) => response.json())
-        .then((data) => {
-          setUserEmail(data.email);
-        })
-        .catch((error) => {
-          console.error('Error fetching user email:', error);
-        });
+    if (isAuthenticated && session?.user?.email) {
+      setUserEmail(session.user.email);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, session]);
 
   useEffect(() => {
     if (userEmail) {
@@ -208,9 +202,9 @@ const Test = () => {
       <div className="dashboard-container">
         <div className="sidebar">
           <div className="profile-section">
-            <img src={user?.picture || "/default-profile.png"} alt={user?.name} className="profile-picture" />
+            <img src={session?.user?.image || "/default-profile.png"} alt={session?.user?.name} className="profile-picture" />
             <h3>Welcome back,</h3>
-            <h2>{user?.name || "User"}</h2>
+            <h2>{session?.user?.name || "User"}</h2>
           </div>
           <div className="nav-links">
             <a onClick={() => handleNavClick('dashboard')}>

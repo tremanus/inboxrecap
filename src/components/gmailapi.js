@@ -1,39 +1,26 @@
-'use client'; // Important for client-side rendering
+"use client"; // Important for client-side rendering
 
 import React, { useEffect, useState } from 'react';
+import { useSession, signIn } from 'next-auth/react'; // Import useSession and signIn from next-auth/react
 import './gmailapi.css'; // Ensure this path is correct
 
 const GmailApi = () => {
+  const { data: session, status } = useSession(); // Use useSession to get session data and status
   const [unreadCount, setUnreadCount] = useState(null);
   const [loading, setLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
   const [emailSent, setEmailSent] = useState(null); // Add this state
-  const [userEmail, setUserEmail] = useState(null);
   const [category, setCategory] = useState('all');
   const [timeRange, setTimeRange] = useState('all');
-  const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState(null);
 
-  const checkAuthorization = async (googleId) => {
-    try {
-      const url = new URL('/api/check-authorization', window.location.origin);
-      url.searchParams.append('google_id', googleId);
-  
-      const response = await fetch(url);
-      const data = await response.json();
-  
-      setAuthorized(data.authorized);
-      if (data.authorized) {
-        fetchUserEmail();
-        fetchUnreadEmailCount();
-      }
-    } catch (error) {
-      console.error('Error checking authorization:', error);
-      setError('Failed to check authorization.');
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchUnreadEmailCount();
     }
-  };  
+  }, [status, category, timeRange]);
 
   const fetchUnreadEmailCount = async () => {
     setLoading(true);
@@ -47,17 +34,6 @@ const GmailApi = () => {
       setError('Failed to fetch unread emails.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchUserEmail = async () => {
-    try {
-      const response = await fetch('/api/get-user-email');
-      const data = await response.json();
-      setUserEmail(data.email || '');
-    } catch (error) {
-      console.error('Error fetching user email:', error);
-      setError('Failed to fetch user email.');
     }
   };
 
@@ -141,37 +117,23 @@ const GmailApi = () => {
     }
   };
 
-  useEffect(() => {
-    checkAuthorization();
-    const intervalId = setInterval(() => {
-      if (authorized) fetchUnreadEmailCount();
-    }, 3600000);
-
-    return () => clearInterval(intervalId);
-  }, [authorized, category, timeRange]);
-
   const authorize = () => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`; // Ensure this matches the callback URL registered in Google Developer Console
-    const scope = 'openid profile email https://www.googleapis.com/auth/gmail.modify'; // Update scopes as needed
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
-
-    window.location.href = authUrl; // Redirect to Google's OAuth 2.0 server
-};
+    signIn('google'); // Redirect to Google OAuth login
+  };
 
   return (
     <div className="gmail-api-container">
-      {!authorized && (
+      {status === 'unauthenticated' && (
         <button onClick={authorize} className="authorize-button">
           <b>Authorize Google Account</b>
         </button>
       )}
-      {userEmail && (
+      {session?.user?.email && (
         <button disabled className="email-button">
-          {`Account: ${userEmail}`}
+          {`Account: ${session.user.email}`}
         </button>
       )}
-      {authorized && (
+      {status === 'authenticated' && (
         <div className="main-container">
           <div className="clear-container">
             <h1>Clear Your Inbox</h1>

@@ -1,36 +1,36 @@
 "use client";
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
-import { useAuth0 } from '@auth0/auth0-react'; // Import useAuth0
+import { useSession, signIn } from 'next-auth/react'; // Import useSession and signIn from next-auth/react
 import './dashboard.css'; // Ensure you have this CSS file for styling
 import GmailApi from './gmailapi';
 
 const Dashboard = () => {
-  const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0(); // Use useAuth0 hook
+  const { data: session, status } = useSession(); // Use useSession hook to get session data and status
   const router = useRouter(); // Initialize router
 
   useEffect(() => {
     document.title = "Dashboard | InboxRecap";
     
-    if (!isLoading && !isAuthenticated) {
-      loginWithRedirect(); // Redirect to Auth0 login page if not authenticated
+    if (status === 'unauthenticated') {
+      signIn(); // Redirect to the login page if not authenticated
     }
-  }, [isLoading, isAuthenticated, loginWithRedirect]);
+  }, [status]);
 
-  if (isLoading) {
+  if (status === 'loading') {
     return <div className="loading">Loading...</div>;
   }
 
   return (
-    isAuthenticated && (
+    session && (
       <div className="dashboard-container">
         {/* Profile Section */}
         <div className="profile-header">
-          <img src={user?.picture} alt={user?.name} className="profile-picture" />
-          <h2 className="profile-name">Welcome, {user?.name}!</h2>
-          <p className="profile-email">{user?.email}</p>
+          <img src={session.user?.image} alt={session.user?.name} className="profile-picture" />
+          <h2 className="profile-name">Welcome, {session.user?.name}!</h2>
+          <p className="profile-email">{session.user?.email}</p>
         </div>
-      <GmailApi />
+        <GmailApi />
       </div>
     )
   );
