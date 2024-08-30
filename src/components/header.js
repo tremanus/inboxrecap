@@ -1,4 +1,3 @@
-// src/components/Header.js
 "use client"; // Add this directive to make the component a client component
 
 import React from 'react';
@@ -21,7 +20,11 @@ const Header = () => {
   };
 
   const handleLogin = () => {
-    loginWithRedirect({ redirectUri: `${window.location.origin}/dashboard` });
+    loginWithRedirect({ redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard` });
+  };
+
+  const handleLogout = () => {
+    logout({ returnTo: process.env.NEXT_PUBLIC_BASE_URL }); // Use environment variable for return URL
   };
 
   return (
@@ -38,7 +41,7 @@ const Header = () => {
         </ul>
         {isAuthenticated ? (
           <>
-            <button className="login-button" onClick={() => logout({ returnTo: window.location.origin })}>Logout</button>
+            <button className="login-button" onClick={handleLogout}>Logout</button>
             <button className="signup-button" onClick={handleDashboardClick}>Dashboard</button>
           </>
         ) : (
