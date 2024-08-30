@@ -16,12 +16,14 @@ const GmailApi = () => {
   const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState(null);
 
-  const SCOPES = 'https://www.googleapis.com/auth/gmail.modify'; // Only the required scope
-
-  const checkAuthorization = async () => {
+  const checkAuthorization = async (googleId) => {
     try {
-      const response = await fetch('/api/check-authorization');
+      const url = new URL('/api/check-authorization', window.location.origin);
+      url.searchParams.append('google_id', googleId);
+  
+      const response = await fetch(url);
       const data = await response.json();
+  
       setAuthorized(data.authorized);
       if (data.authorized) {
         fetchUserEmail();
@@ -31,7 +33,7 @@ const GmailApi = () => {
       console.error('Error checking authorization:', error);
       setError('Failed to check authorization.');
     }
-  };
+  };  
 
   const fetchUnreadEmailCount = async () => {
     setLoading(true);
@@ -150,12 +152,12 @@ const GmailApi = () => {
 
   const authorize = () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`;  // Ensure this matches the callback URL registered in Google Developer Console
-    const scope = SCOPES;
+    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-callback`; // Ensure this matches the callback URL registered in Google Developer Console
+    const scope = 'openid profile email https://www.googleapis.com/auth/gmail.modify'; // Update scopes as needed
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
-  
+
     window.location.href = authUrl; // Redirect to Google's OAuth 2.0 server
-  };  
+};
 
   return (
     <div className="gmail-api-container">
