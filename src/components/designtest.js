@@ -33,7 +33,7 @@ const Test = () => {
     document.title = "Dashboard | InboxRecap";
     
     if (!isLoading && !isAuthenticated) {
-      signIn(); // Redirects to the sign-in page
+      signIn("google"); // Redirects to the sign-in page
     }
   }, [isLoading, isAuthenticated]);
 
