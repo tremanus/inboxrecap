@@ -6,25 +6,7 @@ import Settings from './settings';
 import Billing from './billing';
 import Countdown from './countdown';
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-);
-
+import { createChartData, chartOptions } from './statchart'; // Import from statchart.js
 import './designtest.css';
 
 const Test = () => {
@@ -34,6 +16,9 @@ const Test = () => {
   const [stats, setStats] = useState(null);
   const [unreadCount, setUnreadCount] = useState(null);
   const [summaryTime, setSummaryTime] = useState(null);
+  const [markingAsRead, setMarkingAsRead] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [category, setCategory] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSection, setSelectedSection] = useState('dashboard');
   const [userEmail, setUserEmail] = useState(null);
@@ -41,7 +26,7 @@ const Test = () => {
   const handleNavClick = (section) => {
     setSelectedSection(section);
   };
-  
+
   const router = useRouter();
 
   useEffect(() => {
@@ -104,94 +89,67 @@ const Test = () => {
     return <div className="loading">Loading...</div>;
   }
 
-  const data = {
-    labels: ['Marked as Read', 'Summarized', 'Sent to Trash'],
-    datasets: [
-      {
-        data: [
-          stats?.emails_marked_as_read || 0,
-          stats?.emails_summarized || 0,
-          stats?.emails_sent_to_trash || 0,
-        ],
-        borderColor: '#36A2EB',
-        backgroundColor: [
-          '#1041bd',
-          '#109148',
-          '#c42a1f',
-        ],
-        borderWidth: 2,
-        pointBackgroundColor: [
-          '#1041bd',
-          '#109148',
-          '#c42a1f',
-        ],
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        tension: 0.1,
-      },
-    ],
+  const markAsRead = async () => {
+    setMarkingAsRead(true);
+    try {
+      const response = await fetch('/api/mark-as-read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ category: selectedCategory }), // Ensure selectedCategory is used
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchUnreadEmailCount();
+      } else {
+        console.error('Error marking emails as read:', data.error);
+      }
+    } catch (error) {
+      console.error('Error marking emails as read:', error);
+    } finally {
+      setMarkingAsRead(false);
+    }
+  };
+  
+
+  const deleteEmails = async () => {
+    setDeleting(true);
+    try {
+      const response = await fetch('/api/movetotrash', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ category: selectedCategory }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        // Refresh unread count after deletion
+        fetchUnreadEmailCount();
+      } else {
+        console.error('Error deleting emails:', data.error);
+      }
+    } catch (error) {
+      console.error('Error deleting emails:', error);
+    } finally {
+      setDeleting(false);
+    }
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: (tooltipItem) => {
-            return `${tooltipItem.label}: ${tooltipItem.raw}`;
-          },
-        },
-        titleFont: {
-          family: "'Poppins', sans-serif",
-          size: 16,
-          weight: '600',
-        },
-        bodyFont: {
-          family: "'Poppins', sans-serif",
-          size: 14,
-        },
-      },
-      title: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            family: "'Poppins', sans-serif",
-            size: 12,
-            weight: '600',
-          },
-        },
-      },
-      y: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            family: "'Poppins', sans-serif",
-            size: 12,
-            weight: '600',
-          },
-          beginAtZero: true,
-        },
-      },
-    },
-    layout: {
-      padding: {
-        top: 30,
-        right: 0,
-        bottom: 20,
-        left: 0,
-      },
-    },
+  const fetchUnreadEmailCount = async () => {
+    if (userEmail) {
+      try {
+        const response = await fetch(`/api/findunread?userEmail=${encodeURIComponent(userEmail)}&category=${selectedCategory}`);
+        const data = await response.json();
+        setUnreadCount(data.unreadCount);
+      } catch (error) {
+        console.error('Error fetching unread email count:', error);
+      }
+    }
   };
+
+  const chartData = createChartData(stats); // Use the imported function
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
@@ -247,6 +205,14 @@ const Test = () => {
                 </div>
                 <h2>Total Unread Emails</h2>
                 <p>{unreadCount !== null ? unreadCount : 'Loading...'}</p>
+                <div className="email-actions">
+                <button onClick={markAsRead} disabled={markingAsRead}>
+                  {markingAsRead ? 'Marking as Read...' : 'Mark as Read'}
+                </button>
+                <button onClick={deleteEmails} disabled={deleting}>
+                  {deleting ? 'Moving to Trash...' : 'Move to Trash'}
+                </button>
+              </div>
                 <div className="bottom-elements">
                   <span className="user-email">{userEmail}</span>
                   <img src="/gmaillogo.png" alt="Gmail Logo" className="gmail-logo" />
@@ -254,7 +220,7 @@ const Test = () => {
               </div>
               <div className="line-graph-container">
                 <h2>Email Statistics</h2>
-                <Line data={data} options={options} />
+                <Line data={chartData} options={chartOptions} /> {/* Use imported chartData and chartOptions */}
               </div>
               <div className="stats">
                 <div className="read-stat-box">
@@ -273,10 +239,9 @@ const Test = () => {
                 </div>
               </div>
               <div className="next-summary">
-  <h3>Next Summary in:</h3>
-  {summaryTime !== null ? <Countdown summaryTime={summaryTime} /> : "Loading..."}
-</div>
-
+                <h3>Next Summary in:</h3>
+                {summaryTime !== null ? <Countdown summaryTime={summaryTime} /> : "Loading..."}
+              </div>
             </div>
           )}
           {selectedSection === 'settings' && <Settings />}
@@ -285,6 +250,6 @@ const Test = () => {
       </div>
     )
   );
-};
+}  
 
 export default Test;

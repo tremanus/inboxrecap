@@ -1,35 +1,51 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './designtest.css'; // Import the CSS file
 
-async function fetchUserEmail() {
-    try {
-        const response = await fetch('/api/get-user-email');
-        const data = await response.json();
-        if (response.ok && data.email) {
-            return data.email;
-        } else {
-            throw new Error('Failed to fetch user email');
-        }
-    } catch (error) {
-        console.error('Error fetching user email:', error);
-        throw new Error('Could not retrieve user email');
-    }
-}
-
 export default function Settings() {
-    const [summaryTime, setSummaryTime] = useState('09:00 AM');
-    const [category, setCategory] = useState('All Mail');
+    const [summaryTime, setSummaryTime] = useState('');
+    const [category, setCategory] = useState('');
+    const [currentSummaryTime, setCurrentSummaryTime] = useState('');
+    const [currentCategory, setCurrentCategory] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
 
-    const handleSubmit = async (event) => {
+    useEffect(() => {
+        // Fetch the current settings when the component mounts
+        const fetchCurrentSettings = async () => {
+            try {
+                const response = await fetch('/api/get-user-preferences'); // Use the correct API endpoint
+                const data = await response.json();
+                if (response.ok && data.summary_time && data.categories) {
+                    setCurrentSummaryTime(data.summary_time);
+                    setCurrentCategory(data.categories[0]); // Assuming it's an array and we're interested in the first item
+                    setSummaryTime(data.summary_time);
+                    setCategory(data.categories[0]);
+                } else {
+                    throw new Error('Failed to fetch current settings');
+                }
+            } catch (error) {
+                console.error('Error fetching current settings:', error);
+                setError('Could not retrieve current settings');
+            }
+        };
+
+        fetchCurrentSettings();
+    }, []);
+
+    const handleEdit = () => {
+        setIsEditing(true);
+        setMessage('');
+        setError('');
+    };
+
+    const handleSave = async (event) => {
         event.preventDefault();
         setError('');
         setMessage('');
 
         try {
-            const user_email = await fetchUserEmail();
             const response = await fetch('/api/settings', {
                 method: 'POST',
                 headers: {
@@ -37,8 +53,7 @@ export default function Settings() {
                 },
                 body: JSON.stringify({
                     summary_time: summaryTime,
-                    categories: [category], // Assuming backend expects an array
-                    user_id: user_email, // Remove if not needed
+                    categories: [category], // Backend expects an array
                 }),
             });
 
@@ -46,6 +61,9 @@ export default function Settings() {
 
             if (response.ok) {
                 setMessage(result.message);
+                setCurrentSummaryTime(summaryTime);
+                setCurrentCategory(category);
+                setIsEditing(false);
             } else {
                 setError(result.error || 'An unexpected error occurred.');
             }
@@ -77,42 +95,53 @@ export default function Settings() {
             <h2 className="settings-header">User Settings</h2>
             {error && <p className="settings-error">{error}</p>}
             {message && <p className="settings-message">{message}</p>}
-            <form onSubmit={handleSubmit} className="settings-form">
-                <div className="settings-form-group">
-                    <label className="settings-label">
-                        Summary Time:
-                        <select
-                            value={summaryTime}
-                            onChange={(e) => setSummaryTime(e.target.value)}
-                            className="settings-select"
-                        >
-                            {generateTimeOptions().map((time) => (
-                                <option key={time} value={time}>
-                                    {time}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+
+            {!isEditing ? (
+                <div className="current-settings">
+                    <p>Current Summary Time: {currentSummaryTime}</p>
+                    <p>Current Category: {currentCategory}</p>
+                    <button onClick={handleEdit} className="settings-button">
+                        Edit
+                    </button>
                 </div>
-                <div className="settings-form-group">
-                    <label className="settings-label">
-                        Categories:
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="settings-select"
-                        >
-                            <option value="All Mail">All Mail</option>
-                            <option value="Promotions">Promotions</option>
-                            <option value="Social">Social</option>
-                            <option value="Updates">Updates</option>
-                        </select>
-                    </label>
-                </div>
-                <button type="submit" className="settings-button">
-                    Update
-                </button>
-            </form>
+            ) : (
+                <form onSubmit={handleSave} className="settings-form">
+                    <div className="settings-form-group">
+                        <label className="settings-label">
+                            Summary Time:
+                            <select
+                                value={summaryTime}
+                                onChange={(e) => setSummaryTime(e.target.value)}
+                                className="settings-select"
+                            >
+                                {generateTimeOptions().map((time) => (
+                                    <option key={time} value={time}>
+                                        {time}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                    <div className="settings-form-group">
+                        <label className="settings-label">
+                            Categories:
+                            <select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="settings-select"
+                            >
+                                <option value="All Mail">All Mail</option>
+                                <option value="Promotions">Promotions</option>
+                                <option value="Social">Social</option>
+                                <option value="Updates">Updates</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button type="submit" className="settings-button">
+                        Save
+                    </button>
+                </form>
+            )}
         </div>
     );
 }

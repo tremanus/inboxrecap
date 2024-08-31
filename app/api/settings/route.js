@@ -1,33 +1,27 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Update this path accordingly
 
 // Initialize Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-async function getUserEmail() {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/get-user-email`); // Use absolute URL
-        const data = await response.json();
-        if (response.ok && data.email) {
-            return data.email;
-        } else {
-            throw new Error('Failed to fetch user email');
-        }
-    } catch (error) {
-        console.error('Error fetching user email:', error);
-        throw new Error('Could not retrieve user email');
-    }
-}
-
 export async function POST(request) {
     try {
+        // Get user session
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user || !session.user.email) {
+            return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+        }
+
+        const user_email = session.user.email;
+
         const { summary_time, categories } = await request.json();
 
         if (!summary_time || !categories || !Array.isArray(categories)) {
             return NextResponse.json({ error: 'Invalid input data' }, { status: 400 });
         }
-
-        const user_email = await getUserEmail();
 
         // Check if the user preferences already exist
         const { data: existingPreference, error: fetchError } = await supabase

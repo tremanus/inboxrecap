@@ -150,9 +150,20 @@
     font-weight: bold;
     text-align: left;
     margin-left: 30px;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
     color: #222;
     font-family: 'Poppins', sans-serif;
+  }
+
+  .email-actions {
+    align-items: baseline;
+    margin-left: 20px;
+    margin-bottom: 20px;
+  }
+
+  .email-actions button {
+    padding: 10px;
+    margin-right: 50px;
   }
   
   .bottom-elements {

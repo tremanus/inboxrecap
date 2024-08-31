@@ -1,8 +1,8 @@
 // app/pricing/page.js
-import Dashboard from '../../src/components/dashboard';
+import Test from '../../src/components/designtest';
 
-const DashboardPage = () => {
-  return <Dashboard />;
+const DesignTestPage = () => {
+  return <Test />;
 };
 
-export default DashboardPage;
+export default DesignTestPage;

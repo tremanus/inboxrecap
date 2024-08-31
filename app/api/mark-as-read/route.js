@@ -37,10 +37,7 @@ async function getOAuthClientFromSession(session) {
 
 export async function POST(request) {
   try {
-    // Get session
     const session = await getServerSession(authOptions);
-
-    // Get OAuth client from session
     const oauth2Client = await getOAuthClientFromSession(session);
     
     if (!oauth2Client) {
@@ -51,19 +48,15 @@ export async function POST(request) {
     const profile = await gmail.users.getProfile({ userId: 'me' });
     const userEmail = profile.data.emailAddress;
 
-    const { category, timeRange } = await request.json();
-
-    // Build the query
+    const { category } = await request.json();
     let query = 'is:unread';
-    if (category === 'promotions') query += ' category:promotions';
-    if (category === 'social') query += ' category:social';
-    if (category === 'updates') query += ' category:updates';
-    if (timeRange === '1d') query += ' newer_than:1d';
-    if (timeRange === '1w') query += ' newer_than:7d';
-    if (timeRange === '1m') query += ' newer_than:30d';
-    if (timeRange === '6m') query += ' newer_than:180d';
 
-    // Fetch message IDs
+    if (category === 'promotions') query += ' category:promotions';
+    else if (category === 'social') query += ' category:social';
+    else if (category === 'updates') query += ' category:updates';
+
+    console.log('Query:', query);
+
     let pageToken = null;
     const messageIds = [];
     do {
@@ -72,6 +65,8 @@ export async function POST(request) {
         q: query,
         pageToken: pageToken,
       });
+
+      console.log('Response:', response.data);
 
       if (response.data.messages) {
         response.data.messages.forEach(message => messageIds.push(message.id));
@@ -82,7 +77,6 @@ export async function POST(request) {
 
     console.log('Messages to mark as read:', messageIds);
 
-    // Mark messages as read
     if (messageIds.length > 0) {
       await gmail.users.messages.batchModify({
         userId: 'me',
@@ -93,7 +87,6 @@ export async function POST(request) {
       });
     }
 
-    // Check if user exists in Supabase
     const { data: existingUser, error: fetchError } = await supabase
       .from('email_statistics')
       .select('id')
@@ -105,7 +98,6 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
     }
 
-    // Create user if not exists
     if (!existingUser) {
       const { error: insertError } = await supabase
         .from('email_statistics')
@@ -117,7 +109,6 @@ export async function POST(request) {
       }
     }
 
-    // Update email statistics
     const { data: statsData, error: statsError } = await supabase
       .from('email_statistics')
       .select('emails_marked_as_read')
