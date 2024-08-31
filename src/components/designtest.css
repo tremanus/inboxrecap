@@ -128,7 +128,6 @@
   .unread-emails-box {
     background-color: #fff;
     padding: 40px 20px;
-    margin-top: 15px;
     margin-bottom: 10px;
     width: 45%;
     text-align: center;
@@ -150,20 +149,28 @@
     font-weight: bold;
     text-align: left;
     margin-left: 30px;
-    margin-bottom: 10px;
     color: #222;
     font-family: 'Poppins', sans-serif;
   }
 
   .email-actions {
-    align-items: baseline;
-    margin-left: 20px;
-    margin-bottom: 20px;
+    display: flex; /* Ensure the container is a flex container */
+    justify-content: flex-end; /* Align items to the end (right) of the container */
+    margin-bottom: 40px;
+    margin-right: 20px;
   }
+  
 
   .email-actions button {
-    padding: 10px;
-    margin-right: 50px;
+    padding: 12px;
+    margin-left: 20px;
+    background-color: #f6f6fb;
+    border: 1px solid rgb(85, 13, 130);
+  }
+
+  .email-actions button:hover {
+    background-color: #f2f2fd;
+    cursor: pointer;
   }
   
   .bottom-elements {
