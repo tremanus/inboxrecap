@@ -30,7 +30,6 @@
 .home-content p {
   color: #333;
   margin: 10px 0 20px; /* Margin adjusted to align with text alignment */
-  margin-top: 20px;
 }
 
 .home-content p.check {
@@ -42,7 +41,7 @@
 .home-content p.cancel {
   color: #888; /* For cancel text */
   margin: 10px 0; /* Reduced vertical spacing */
-  margin-top: 85px;
+  margin-top: 75px;
   margin-left: 25px;
   font-size: 0.9rem;
 }
@@ -61,7 +60,7 @@
   text-align: center;
   transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin-top: 480px;
+  top: 620px;
 }
 
 .try-button:hover {
@@ -77,12 +76,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.email-counter h1 {
-  font-size: 2rem;
-  color: #333;
-  margin: 0; /* Remove default margin */
 }
 
 /* Features Section */

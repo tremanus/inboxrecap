@@ -47,7 +47,7 @@ const Countdown = ({ summaryTime }) => {
 
   return (
     <>
-      <div className="time-remaining">{timeRemaining}</div>
+      <h4 className="time-remaining">{timeRemaining}</h4>
       <div className="countdown-timer">
         <div className="progress-bar" style={{ width: `${progress}%` }}></div>
       </div>

@@ -94,6 +94,7 @@ const Home = () => {
         <p className="check">✅ Mark your unread emails from the last day as read</p>
         <p className="check">✅ Summarize each email in one sentence</p>
         <p className="check">✅ Receive all the summaries in one daily email</p>
+        <p className="check">✅ Mass delete emails & unsubscribe from mailing lists</p>
         <button className="try-button" onClick={handlePricingClick}>Try For Free</button>
         <p className="cancel">Cancel anytime</p>
         <div className="email-counter-container">

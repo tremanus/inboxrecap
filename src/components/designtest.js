@@ -218,10 +218,15 @@ const Test = () => {
                   <img src="/gmaillogo.png" alt="Gmail Logo" className="gmail-logo" />
                 </div>
               </div>
-              <div className="line-graph-container">
-                <h2>Email Statistics</h2>
-                <Line data={chartData} options={chartOptions} /> {/* Use imported chartData and chartOptions */}
-              </div>
+              <div className="next-summary">
+              <h3>Next Summary in:</h3>
+              {summaryTime !== null ? <Countdown summaryTime={summaryTime} /> : "Loading..."}
+              <p>{summaryTime}</p>
+            </div>
+            <div className="line-graph-container">
+              <h2>Email Statistics</h2>
+              <Line data={chartData} options={chartOptions} /> {/* Use imported chartData and chartOptions */}
+            </div>
               <div className="stats">
                 <div className="read-stat-box">
                   <h2>Emails Marked as Read</h2>
@@ -237,10 +242,6 @@ const Test = () => {
                     <p>{stats?.emails_sent_to_trash || '0'}</p>
                   </div>
                 </div>
-              </div>
-              <div className="next-summary">
-                <h3>Next Summary in:</h3>
-                {summaryTime !== null ? <Countdown summaryTime={summaryTime} /> : "Loading..."}
               </div>
             </div>
           )}
