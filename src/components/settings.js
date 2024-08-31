@@ -11,6 +11,15 @@ export default function Settings() {
     const [error, setError] = useState('');
     const [isEditing, setIsEditing] = useState(false);
 
+    // Helper function to convert 24-hour time to 12-hour time with AM/PM
+    const convertTo12HourFormat = (time24) => {
+        const [hours, minutes] = time24.split(':').map(Number);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const formattedHour = hours % 12 || 12; // Convert to 12-hour format
+        const formattedMinute = minutes.toString().padStart(2, '0');
+        return `${formattedHour}:${formattedMinute} ${period}`;
+    };
+
     useEffect(() => {
         // Fetch the current settings when the component mounts
         const fetchCurrentSettings = async () => {
@@ -18,9 +27,10 @@ export default function Settings() {
                 const response = await fetch('/api/get-user-preferences'); // Use the correct API endpoint
                 const data = await response.json();
                 if (response.ok && data.summary_time && data.categories) {
-                    setCurrentSummaryTime(data.summary_time);
+                    const formattedSummaryTime = convertTo12HourFormat(data.summary_time);
+                    setCurrentSummaryTime(formattedSummaryTime);
                     setCurrentCategory(data.categories[0]); // Assuming it's an array and we're interested in the first item
-                    setSummaryTime(data.summary_time);
+                    setSummaryTime(formattedSummaryTime);
                     setCategory(data.categories[0]);
                 } else {
                     throw new Error('Failed to fetch current settings');
@@ -45,6 +55,12 @@ export default function Settings() {
         setError('');
         setMessage('');
 
+        // Convert the time back to 24-hour format for submission
+        const [time, period] = summaryTime.split(' ');
+        const [hours, minutes] = time.split(':').map(Number);
+        const hours24 = period === 'PM' && hours < 12 ? hours + 12 : period === 'AM' && hours === 12 ? 0 : hours;
+        const summaryTime24 = `${String(hours24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+
         try {
             const response = await fetch('/api/settings', {
                 method: 'POST',
@@ -52,7 +68,7 @@ export default function Settings() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    summary_time: summaryTime,
+                    summary_time: summaryTime24,
                     categories: [category], // Backend expects an array
                 }),
             });
