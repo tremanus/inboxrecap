@@ -129,14 +129,15 @@ export async function POST(request) {
 
         // Append summary to the email summaries string with Mark as Unread and Reply buttons
         emailSummaries += `
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin: 20px; margin-bottom: 40px">
-            <p style="font-size: 16px; color: #333;"><strong>From:</strong> ${sender}</p>
-            <p style="font-size: 16px; color: #333;"><strong>Subject:</strong> ${subject}</p>
-            <p style="font-size: 16px; color: #333; margin-top: 20px;">${summary}</p>
-            <div style="margin-top: 20px;">
-              <a href="https://mail.google.com/mail/u/0/#inbox/${messageId}" style="text-decoration: none; padding: 10px 20px; background-color: #007bff; color: white; border-radius: 5px; display: inline-block; margin: 0 auto; text-align: center;">Reply</a>
-            </div>
-          </div>
+          <div style="position: relative; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin: 20px; margin-bottom: 40px;">
+  <a href="https://mail.google.com/mail/u/0/#inbox/${messageId}" style="position: absolute; top: 30px; right: 30px; text-decoration: none; padding: 10px 15px; background-color: #ece9f0; color: black; border-radius: 5px; border: 0.5px solid black; display: flex; align-items: center;">
+    <img src="https://static.thenounproject.com/png/2197843-200.png" alt="Reply Icon" style="width: 20px; height: 20px; margin-right: 10px;">
+    Reply
+  </a>
+  <p style="font-size: 16px; color: #333;"><strong>From:</strong> ${sender}</p>
+  <p style="font-size: 16px; color: #333;"><strong>Subject:</strong> ${subject}</p>
+  <p style="font-size: 16px; color: #333; margin-top: 20px;">${summary}</p>
+</div>
         `;
 
         // Mark the email as read
@@ -184,7 +185,7 @@ export async function POST(request) {
       to: [userEmail],
       subject: `${currentDate} - InboxRecap`,
       html: `
-        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; width: 70%; margin: 40px auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; width: 90%; margin: 40px auto; border: 1px solid #e0e0e0; border-radius: 10px;">
           <!-- Hidden Preheader Text -->
           <span style="display:none; color:transparent; max-height:0; max-width:0; opacity:0; overflow:hidden;">This is your daily InboxRecap.</span>
           
