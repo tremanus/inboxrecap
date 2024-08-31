@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path based on your project structure
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 async function getOAuthClientFromSession(session) {
@@ -20,18 +19,43 @@ async function getOAuthClientFromSession(session) {
 
   oauth2Client.setCredentials({
     access_token: session.user.accessToken,
-    refresh_token: session.user.refreshToken, // Handle if refresh_token is provided
+    refresh_token: session.user.refreshToken,
   });
 
-  // Ensure the client has the required scopes
   oauth2Client.on('tokens', (tokens) => {
     if (tokens.refresh_token) {
-      // Store the refresh token in the session or database if needed
       console.log('Refresh token:', tokens.refresh_token);
     }
   });
 
   return oauth2Client;
+}
+
+async function handleRequest(gmail, messageIds) {
+  const batchSize = 10;
+  const delay = 1000; // 1 second delay between batches
+
+  for (let i = 0; i < messageIds.length; i += batchSize) {
+    const batch = messageIds.slice(i, i + batchSize);
+    try {
+      await Promise.all(
+        batch.map(messageId =>
+          gmail.users.messages.trash({
+            userId: 'me',
+            id: messageId,
+          })
+        )
+      );
+    } catch (error) {
+      if (error.response && error.response.status === 429) {
+        console.log('Rate limit exceeded, retrying...');
+        await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
+        i -= batchSize; // Retry the failed batch
+      } else {
+        throw error; // Rethrow other errors
+      }
+    }
+  }
 }
 
 export async function POST(request) {
@@ -54,8 +78,6 @@ export async function POST(request) {
     else if (category === 'social') query += ' category:social';
     else if (category === 'updates') query += ' category:updates';
 
-    console.log('Query:', query);
-
     let pageToken = null;
     const messageIds = [];
     do {
@@ -65,8 +87,6 @@ export async function POST(request) {
         pageToken: pageToken,
       });
 
-      console.log('Response:', response.data);
-
       if (response.data.messages) {
         response.data.messages.forEach(message => messageIds.push(message.id));
       }
@@ -74,17 +94,8 @@ export async function POST(request) {
       pageToken = response.data.nextPageToken;
     } while (pageToken);
 
-    console.log('Messages to move to trash:', messageIds);
-
     if (messageIds.length > 0) {
-      await Promise.all(
-        messageIds.map(messageId =>
-          gmail.users.messages.trash({
-            userId: 'me',
-            id: messageId,
-          })
-        )
-      );
+      await handleRequest(gmail, messageIds);
     }
 
     const { data: existingUser, error: fetchError } = await supabase
