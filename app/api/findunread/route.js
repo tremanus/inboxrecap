@@ -1,8 +1,7 @@
-// app/api/markasread/route.js
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path based on your project structure
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 async function getOAuthClientFromSession(session) {
   if (!session || !session.user || !session.user.accessToken) {
@@ -20,10 +19,7 @@ async function getOAuthClientFromSession(session) {
 
 export async function GET(request) {
   try {
-    // Get session
     const session = await getServerSession(authOptions);
-
-    // Get OAuth client from session
     const oauth2Client = await getOAuthClientFromSession(session);
     
     if (!oauth2Client) {
@@ -39,42 +35,41 @@ export async function GET(request) {
 
     let unreadCount = 0;
     let pageToken = null;
+    const batchSize = 4000;
+    let processedEmails = 0;
 
     let query = 'is:unread';
-    
-    if (category === 'promotions') {
-      query += ' category:promotions';
-    } else if (category === 'social') {
-      query += ' category:social';
-    } else if (category === 'updates') {
-      query += ' category:updates';
-    }
+    if (category === 'promotions') query += ' category:promotions';
+    if (category === 'social') query += ' category:social';
+    if (category === 'updates') query += ' category:updates';
 
-    if (timeRange === '1d') {
-      query += ' newer_than:1d';
-    } else if (timeRange === '1w') {
-      query += ' newer_than:7d';
-    } else if (timeRange === '1m') {
-      query += ' newer_than:30d';
-    } else if (timeRange === '6m') {
-      query += ' newer_than:180d';
-    }
+    if (timeRange === '1d') query += ' newer_than:1d';
+    if (timeRange === '1w') query += ' newer_than:7d';
+    if (timeRange === '1m') query += ' newer_than:30d';
+    if (timeRange === '6m') query += ' newer_than:180d';
 
     do {
       const response = await gmail.users.messages.list({
         userId: 'me',
         q: query,
         pageToken: pageToken,
+        maxResults: batchSize, // Process in batches
       });
 
       if (response.data.messages) {
         unreadCount += response.data.messages.length;
+        processedEmails += response.data.messages.length;
       }
 
       pageToken = response.data.nextPageToken;
+
+      // Break the loop if we've processed enough emails in this batch
+      if (processedEmails >= batchSize) {
+        break;
+      }
     } while (pageToken);
 
-    return NextResponse.json({ unreadCount });
+    return NextResponse.json({ unreadCount, processedEmails });
   } catch (error) {
     console.error('Error fetching unread emails:', error); // Log error
     return NextResponse.json({ error: error.message }, { status: 500 });
