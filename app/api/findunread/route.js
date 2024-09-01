@@ -35,8 +35,7 @@ export async function GET(request) {
 
     let unreadCount = 0;
     let pageToken = null;
-    const batchSize = 4000;
-    let processedEmails = 0;
+    const batchSize = 3000;
 
     let query = 'is:unread';
     if (category === 'promotions') query += ' category:promotions';
@@ -53,23 +52,18 @@ export async function GET(request) {
         userId: 'me',
         q: query,
         pageToken: pageToken,
-        maxResults: batchSize, // Process in batches
+        maxResults: batchSize,
       });
 
       if (response.data.messages) {
         unreadCount += response.data.messages.length;
-        processedEmails += response.data.messages.length;
       }
 
       pageToken = response.data.nextPageToken;
 
-      // Break the loop if we've processed enough emails in this batch
-      if (processedEmails >= batchSize) {
-        break;
-      }
     } while (pageToken);
 
-    return NextResponse.json({ unreadCount, processedEmails });
+    return NextResponse.json({ unreadCount });
   } catch (error) {
     console.error('Error fetching unread emails:', error); // Log error
     return NextResponse.json({ error: error.message }, { status: 500 });
