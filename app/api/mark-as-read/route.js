@@ -15,13 +15,25 @@ async function getOAuthClientFromSession(session) {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
   );
 
   oauth2Client.setCredentials({
     access_token: session.user.accessToken,
     refresh_token: session.user.refreshToken,
   });
+
+  // Check if access token is expired and refresh if necessary
+  if (Date.now() >= session.user.expires_at) {
+    try {
+      const tokens = await oauth2Client.refreshAccessToken();
+      oauth2Client.setCredentials(tokens.credentials); // Update with new tokens
+      session.user.accessToken = tokens.credentials.access_token;
+    } catch (error) {
+      console.error('Error refreshing access token:', error);
+      return null;
+    }
+  }
 
   return oauth2Client;
 }
@@ -30,7 +42,7 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     const oauth2Client = await getOAuthClientFromSession(session);
-    
+
     if (!oauth2Client) {
       return NextResponse.json({ error: 'No credentials found' }, { status: 401 });
     }
@@ -60,8 +72,6 @@ export async function POST(request) {
         pageToken: pageToken,
         maxResults: batchSize,
       });
-
-      console.log('Response:', response.data);
 
       if (response.data.messages) {
         response.data.messages.forEach(message => messageIds.push(message.id));

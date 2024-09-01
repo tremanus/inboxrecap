@@ -15,19 +15,22 @@ async function getOAuthClientFromSession(session) {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
   );
 
   oauth2Client.setCredentials({
     access_token: session.user.accessToken,
-    refresh_token: session.user.refreshToken, // Handle if refresh_token is provided
+    refresh_token: session.user.refreshToken,
   });
 
-  // Ensure the client has the required scopes
-  oauth2Client.on('tokens', (tokens) => {
+  oauth2Client.on('tokens', async (tokens) => {
     if (tokens.refresh_token) {
-      // Store the refresh token in the session or database if needed
-      console.log('Refresh token:', tokens.refresh_token);
+      console.log('New refresh token:', tokens.refresh_token);
+      // Update refresh token in your storage if needed
+    }
+    if (tokens.access_token) {
+      session.user.accessToken = tokens.access_token;
+      // Update access token in your storage if needed
     }
   });
 
@@ -54,42 +57,39 @@ export async function POST(request) {
     else if (category === 'social') query += ' category:social';
     else if (category === 'updates') query += ' category:updates';
 
-    console.log('Query:', query);
-
     let pageToken = null;
-    const messageIds = [];
+    let totalMessagesProcessed = 0;
+    const maxMessagesPerBatch = 50;
+
     do {
       const response = await gmail.users.messages.list({
         userId: 'me',
         q: query,
         pageToken: pageToken,
+        maxResults: maxMessagesPerBatch,
       });
 
-      console.log('Response:', response.data);
+      const messageIds = response.data.messages ? response.data.messages.map(message => message.id) : [];
 
-      if (response.data.messages) {
-        response.data.messages.forEach(message => messageIds.push(message.id));
+      if (messageIds.length > 0) {
+        await Promise.all(
+          messageIds.map(messageId =>
+            gmail.users.messages.trash({
+              userId: 'me',
+              id: messageId,
+            })
+          )
+        );
+        totalMessagesProcessed += messageIds.length;
       }
 
       pageToken = response.data.nextPageToken;
-    } while (pageToken);
+    } while (pageToken && totalMessagesProcessed < 500); // Limit total messages processed
 
-    console.log('Messages to move to trash:', messageIds);
-
-    if (messageIds.length > 0) {
-      await Promise.all(
-        messageIds.map(messageId =>
-          gmail.users.messages.trash({
-            userId: 'me',
-            id: messageId,
-          })
-        )
-      );
-    }
-
+    // Supabase operations
     const { data: existingUser, error: fetchError } = await supabase
       .from('email_statistics')
-      .select('id')
+      .select('id, emails_sent_to_trash')
       .eq('user_id', userEmail)
       .single();
 
@@ -101,37 +101,24 @@ export async function POST(request) {
     if (!existingUser) {
       const { error: insertError } = await supabase
         .from('email_statistics')
-        .insert([{ user_id: userEmail }]);
+        .insert([{ user_id: userEmail, emails_sent_to_trash: totalMessagesProcessed }]);
 
       if (insertError) {
         console.error('Error creating user:', insertError);
         return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
       }
-    }
+    } else {
+      const updatedCount = (existingUser.emails_sent_to_trash || 0) + totalMessagesProcessed;
 
-    const { data: statsData, error: statsError } = await supabase
-      .from('email_statistics')
-      .select('emails_sent_to_trash')
-      .eq('user_id', userEmail)
-      .single();
+      const { error: updateError } = await supabase
+        .from('email_statistics')
+        .update({ emails_sent_to_trash: updatedCount })
+        .eq('user_id', userEmail);
 
-    if (statsError) {
-      console.error('Error fetching email stats:', statsError);
-      return NextResponse.json({ error: 'Failed to fetch email stats' }, { status: 500 });
-    }
-
-    const currentCount = statsData ? statsData.emails_sent_to_trash : 0;
-    const { data, error: updateError } = await supabase
-      .from('email_statistics')
-      .upsert({
-        user_id: userEmail,
-        emails_sent_to_trash: currentCount + messageIds.length,
-      }, 
-      { onConflict: ['user_id'] });
-
-    if (updateError) {
-      console.error('Error updating Supabase:', updateError);
-      return NextResponse.json({ error: 'Failed to update email stats' }, { status: 500 });
+      if (updateError) {
+        console.error('Error updating Supabase:', updateError);
+        return NextResponse.json({ error: 'Failed to update email stats' }, { status: 500 });
+      }
     }
 
     return NextResponse.json({ success: true });
