@@ -130,7 +130,10 @@ export async function POST(request) {
         // Append summary to the email summaries string with Mark as Unread and Reply buttons
         emailSummaries += `
           <div style="position: relative; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin: 20px; margin-bottom: 40px;">
-  <a href="https://mail.google.com/mail/u/0/#inbox/${messageId}" style="position: absolute; top: 30px; right: 30px; text-decoration: none; padding: 10px 15px; background-color: #ece9f0; color: black; border-radius: 5px; border: 0.5px solid black; display: flex; align-items: center;">
+  <a href="https://mail.google.com/mail/u/0/#inbox/${messageId}" 
+     style="position: absolute; top: 30px; right: 30px; text-decoration: none; padding: 8px 15px; background-color: #f0edf5; color: black; border-radius: 5px; border: 0.5px solid black; display: flex; align-items: center; transition: all 0.3s ease;"
+     onmouseover="this.style.backgroundColor='#ece9f0'; this.style.boxShadow='0px 2px 4px rgba(0, 0, 0, 0.1)';"
+     onmouseout="this.style.backgroundColor='#f0edf5'; this.style.boxShadow='0px 2px 4px rgba(0, 0, 0, 0)';">
     <img src="https://static.thenounproject.com/png/2197843-200.png" alt="Reply Icon" style="width: 20px; height: 20px; margin-right: 10px;">
     Reply
   </a>
