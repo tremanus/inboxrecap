@@ -12,7 +12,6 @@ async function getOAuthClientFromSession(session) {
     return null;
   }
 
-  // Initialize OAuth2 client with necessary scopes
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
@@ -21,15 +20,7 @@ async function getOAuthClientFromSession(session) {
 
   oauth2Client.setCredentials({
     access_token: session.user.accessToken,
-    refresh_token: session.user.refreshToken, // Handle if refresh_token is provided
-  });
-
-  // Ensure the client has the required scopes
-  oauth2Client.on('tokens', (tokens) => {
-    if (tokens.refresh_token) {
-      // Store the refresh token in the session or database if needed
-      console.log('Refresh token:', tokens.refresh_token);
-    }
+    refresh_token: session.user.refreshToken,
   });
 
   return oauth2Client;
@@ -58,12 +49,16 @@ export async function POST(request) {
     console.log('Query:', query);
 
     let pageToken = null;
-    const messageIds = [];
+    const batchSize = 2000;
+    let totalEmailsMarkedAsRead = 0;
+
     do {
+      const messageIds = [];
       const response = await gmail.users.messages.list({
         userId: 'me',
         q: query,
         pageToken: pageToken,
+        maxResults: batchSize,
       });
 
       console.log('Response:', response.data);
@@ -72,20 +67,21 @@ export async function POST(request) {
         response.data.messages.forEach(message => messageIds.push(message.id));
       }
 
+      if (messageIds.length > 0) {
+        await gmail.users.messages.batchModify({
+          userId: 'me',
+          requestBody: {
+            ids: messageIds,
+            removeLabelIds: ['UNREAD'],
+          },
+        });
+        totalEmailsMarkedAsRead += messageIds.length;
+      }
+
       pageToken = response.data.nextPageToken;
     } while (pageToken);
 
-    console.log('Messages to mark as read:', messageIds);
-
-    if (messageIds.length > 0) {
-      await gmail.users.messages.batchModify({
-        userId: 'me',
-        requestBody: {
-          ids: messageIds,
-          removeLabelIds: ['UNREAD'],
-        },
-      });
-    }
+    console.log('Total emails marked as read:', totalEmailsMarkedAsRead);
 
     const { data: existingUser, error: fetchError } = await supabase
       .from('email_statistics')
@@ -121,11 +117,11 @@ export async function POST(request) {
     }
 
     const currentCount = statsData ? statsData.emails_marked_as_read : 0;
-    const { data, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from('email_statistics')
       .upsert({
         user_id: userEmail,
-        emails_marked_as_read: currentCount + messageIds.length,
+        emails_marked_as_read: currentCount + totalEmailsMarkedAsRead,
       }, 
       { onConflict: ['user_id'] });
 
