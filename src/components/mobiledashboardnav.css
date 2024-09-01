@@ -1,0 +1,82 @@
+/* Mobile Dashboard Navigation */
+.mobile-dashboard-nav {
+    background-color: #fff;
+    color: #000;
+    height: 250px; /* Adjust height as needed */
+    padding: 30px;
+    display: flex;
+    flex-direction: column; /* Stack profile and nav links vertically */
+    align-items: center; /* Center align content horizontally */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    border-bottom: 1px solid #afafaf; /* Optional: Add a bottom border */
+    width: 100vw; /* Full viewport width */
+    position: absolute;
+    top: 100; /* Positioning at the top of the viewport */
+    left: 0; /* Align to the left edge of the viewport */
+    box-sizing: border-box; /* Include padding in width */
+  }
+  
+  /* Profile Section */
+  .mobile-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; /* Increase margin for better spacing */
+  }
+  
+  .mobile-profile-picture {
+    border-radius: 50%;
+    width: 80px; /* Adjust size as needed */
+    height: 80px; /* Adjust size as needed */
+    margin-bottom: 10px;
+  }
+  
+  .mobile-profile-section h2 {
+    font-size: 1.2rem;
+    color: #111;
+    font-weight: 600;
+  }
+  
+  .mobile-profile-section h3 {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 600;
+  }
+  
+  /* Navigation Links */
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: row; /* Stack links horizontally */
+    justify-content: center; /* Center align items horizontally */
+    width: 100%; /* Full width to ensure full coverage */
+  }
+  
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    color: #555;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 10px 20px;
+    transition: color 0.3s, background-color 0.3s, font-weight 0.3s;
+    border-radius: 5px;
+  }
+  
+  .mobile-nav-link img {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .mobile-nav-link:hover {
+    color: #000;
+    text-shadow: 0px 4px 8px rgba(106, 104, 104, 0.2);
+    cursor: pointer;
+  }
+  
+  .mobile-nav-link.active {
+    font-weight: bold;
+    color: #000; /* Optional: Change color for the active link */
+  }
+  

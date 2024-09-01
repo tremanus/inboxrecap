@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import './designtest.css'; // Import the CSS file
+import './settings.css'; // Import the CSS file
 
 export default function Settings() {
     const [summaryTime, setSummaryTime] = useState('');

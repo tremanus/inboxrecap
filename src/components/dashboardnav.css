@@ -1,0 +1,91 @@
+/* Sidebar */
+.sidebar {
+    background-color: #fff;
+    color: #000;
+    width: 300px;
+    padding: 20px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-section {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .profile-picture {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    margin: 20px 0;
+    margin-top: 50px;
+  }
+  
+  .profile-section h2 {
+    font-size: 1.6rem;
+    color: #111;
+    font-weight: 600;
+  }
+  
+  .profile-section h3 {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 600;
+  }
+  
+  .nav-links {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    color: #666;
+    text-decoration: none;
+    margin: 15px 0;
+    font-size: 1.2rem;
+    padding: 10px;
+    transition: color 0.3s, background-color 0.3s, font-weight 0.3s;
+    border-radius: 5px;
+  }
+  
+  .nav-link img {
+    margin-right: 15px;
+    width: 20px;
+    height: 20px;
+    margin-left: 50px;
+  }
+  
+  .nav-link:hover {
+    color: #000000;
+    text-shadow: 0px 4px 8px rgba(106, 104, 104, 0.2);
+    cursor: pointer;
+  }
+  
+  .nav-link.active {
+    font-weight: bold;
+    color: #000; /* Optional: Change color for the active link */
+  }
+  
+  .dash-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 140px;
+    margin-left: -3px;
+  }
+  
+  .dash-logo img {
+    margin-right: 5px;
+    width: 30px;
+  }
+  
+  .dash-site-title {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  

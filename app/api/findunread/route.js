@@ -3,17 +3,6 @@ import { google } from 'googleapis';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-async function refreshAccessToken(oauth2Client) {
-  try {
-    const { credentials } = await oauth2Client.refreshAccessToken();
-    oauth2Client.setCredentials(credentials);
-    return credentials;
-  } catch (error) {
-    console.error('Error refreshing access token:', error);
-    return null;
-  }
-}
-
 async function getOAuthClientFromSession(session) {
   if (!session || !session.user || !session.user.accessToken) {
     console.error('No session or access token found');
@@ -23,19 +12,7 @@ async function getOAuthClientFromSession(session) {
   const oauth2Client = new google.auth.OAuth2();
   oauth2Client.setCredentials({
     access_token: session.user.accessToken,
-    refresh_token: session.user.refreshToken,
   });
-
-  // Refresh the token if necessary
-  try {
-    const tokens = await refreshAccessToken(oauth2Client);
-    if (tokens) {
-      session.user.accessToken = tokens.access_token;
-    }
-  } catch (error) {
-    console.error('Error refreshing access token:', error);
-    return null;
-  }
 
   return oauth2Client;
 }
@@ -88,7 +65,7 @@ export async function GET(request) {
 
     return NextResponse.json({ unreadCount });
   } catch (error) {
-    console.error('Error fetching unread emails:', error);
+    console.error('Error fetching unread emails:', error); // Log error
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

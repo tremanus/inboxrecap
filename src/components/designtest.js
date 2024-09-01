@@ -5,6 +5,8 @@ import { useSession, signIn } from 'next-auth/react';
 import Settings from './settings';
 import Billing from './billing';
 import Countdown from './countdown';
+import DashboardNav from './dashboardnav';
+import MobileDashboardNav from './mobiledashboardnav';
 import { Line } from 'react-chartjs-2';
 import { createChartData, chartOptions } from './statchart'; // Import from statchart.js
 import './designtest.css';
@@ -22,6 +24,7 @@ const Test = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSection, setSelectedSection] = useState('dashboard');
   const [userEmail, setUserEmail] = useState(null);
+  const [isMobile, setIsMobile] = useState(false); // Track screen size for mobile view
 
   const handleNavClick = (section) => {
     setSelectedSection(section);
@@ -42,6 +45,20 @@ const Test = () => {
       setUserEmail(session.user.email);
     }
   }, [isAuthenticated, session]);
+
+  useEffect(() => {
+    // Check screen size on component mount and resize
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 821); // Set 768px as breakpoint for mobile
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (userEmail) {
@@ -158,37 +175,25 @@ const Test = () => {
   return (
     isAuthenticated && (
       <div className="dashboard-container">
-        <div className="sidebar">
-          <div className="profile-section">
-            <img src={session?.user?.image || "/default-profile.png"} alt={session?.user?.name} className="profile-picture" />
-            <h3>Welcome back,</h3>
-            <h2>{session?.user?.name || "User"}</h2>
-          </div>
-          <div className="nav-links">
-            <a onClick={() => handleNavClick('dashboard')}>
-              <img src="/dashboard.png" alt="Dashboard Icon" />
-              Dashboard
-            </a>
-            <a onClick={() => handleNavClick('settings')}>
-              <img src="/settings.png" alt="Settings Icon" />
-              Settings
-            </a>
-            <a onClick={() => handleNavClick('billing')}>
-              <img src="/billing.png" alt="Billing Icon" />
-              Billing
-            </a>
-          </div>
-          <div className="dash-logo">
-            <img src="/favicon.ico" alt="InboxRecap Logo" />
-            <span className="dash-site-title">InboxRecap</span>
-          </div>
-        </div>
+        {isMobile ? (
+          <MobileDashboardNav
+            selectedSection={selectedSection}
+            handleNavClick={handleNavClick}
+          />
+        ) : (
+          <DashboardNav
+            selectedSection={selectedSection}
+            handleNavClick={handleNavClick}
+            userEmail={userEmail}
+          />
+        )}
         <div className="main-content">
           <div className="header">
             <h1>{selectedSection.charAt(0).toUpperCase() + selectedSection.slice(1)}</h1>
           </div>
           {selectedSection === 'dashboard' && (
             <div className="content-container">
+                <div className="top-row">
               <div className="unread-emails-box">
                 <div className="selector-container">
                   <select 
@@ -223,6 +228,8 @@ const Test = () => {
               {summaryTime !== null ? <Countdown summaryTime={summaryTime} /> : "Loading..."}
               <p>{summaryTime}</p>
             </div>
+            </div>
+            <div className="big-stats">
             <div className="line-graph-container">
               <h2>Email Statistics</h2>
               <Line data={chartData} options={chartOptions} /> {/* Use imported chartData and chartOptions */}
@@ -241,6 +248,7 @@ const Test = () => {
                     <h1>Emails Sent to Trash</h1>
                     <p>{stats?.emails_sent_to_trash || '0'}</p>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
