@@ -156,7 +156,7 @@ export async function POST(request) {
     <div style="text-align: center; width: 100%;">
         <a href="https://mail.google.com/mail/u/0/#inbox/${messageId}" 
            style="text-decoration: none; padding: 8px 15px; background-color: #f9f9f9; color: black; border-radius: 5px; border: 0.5px solid black; display: inline-block;">
-           Open Email
+           View / Reply
         </a>
     </div>
 </div>

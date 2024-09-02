@@ -29,6 +29,10 @@ const Header = () => {
     signOut({ callbackUrl: '/' }); // Redirect to homepage on logout
   };
 
+  if (session) {
+    return null;
+  }
+
   return (
     <header>
       <Link href="/" className="logo-container">
