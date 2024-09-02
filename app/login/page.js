@@ -1,13 +1,16 @@
 'use client';
 import React from 'react';
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 import '../../src/components/login.css'; // Import the CSS file
 import { Google } from '@mui/icons-material'; // Import the Google icon from Material-UI
 
 const Login = () => {
-  const handleSignIn = () => {
+  const router = useRouter(); // Initialize useRouter
+
+  const handleSignIn = async () => {
     // Trigger the NextAuth sign-in function with the 'google' provider
-    signIn('google');
+    await signIn('google', { callbackUrl: '/' }); // Redirect to home page after login
   };
 
   return (

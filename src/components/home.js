@@ -20,6 +20,7 @@ const Home = () => {
     <section className="home">
       <div className="home-content">
         <h1>Manage your mail efficiently</h1>
+        <h2>Receive AI-powered daily recaps of your inbox</h2>
         <p><b>Don't waste countless hours going through all of your emails:</b></p>
         <p className="check">✅ Mark your unread emails from the last day as read</p>
         <p className="check">✅ Summarize each email in one sentence</p>

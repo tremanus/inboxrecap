@@ -26,13 +26,14 @@ body {
 
 .home-content h1,
 .home-content p {
-  max-width: 660px; /* Limit the maximum width of the text */
+  max-width: 760px; /* Limit the maximum width of the text */
   text-align: center; /* Center text horizontally */
 }
 
 .home-content h1 {
-  font-size: 4rem;
-  font-weight: 800;
+  font-size: 5rem;
+  font-weight: 750;
+  color: #222;
   margin: 40px 0 20px; /* Adjust margin to ensure spacing */
 }
 

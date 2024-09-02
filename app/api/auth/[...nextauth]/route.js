@@ -10,7 +10,6 @@ export const authOptions = {
       authorization: {
         params: {
           access_type: "offline",
-          prompt: "consent",
           scope: 'openid profile email https://www.googleapis.com/auth/gmail.modify',
         },
       },

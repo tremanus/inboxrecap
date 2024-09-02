@@ -53,23 +53,23 @@ header {
   
   nav ul li a {
     text-decoration: none;
-    color: #333;
-    font-weight: 500;
+    color: #555;
+    font-weight: 600;
   }
   
   nav ul li a:hover {
-    text-decoration: underline;
+    color: #000;
   }
   
   .login-button {
-    background: #e3f2fd;
+    background: rgb(244, 244, 244);
     border: none;
     color: #333;
     padding: 10px 20px;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 25px; /* Increased border-radius for cylindrical look */
+    border-radius: 15px; /* Increased border-radius for cylindrical look */
     margin-left: 20px;
     text-align: center;
     transition: background-color 0.3s ease;
@@ -78,7 +78,6 @@ header {
   }
   
   .login-button:hover {
-    background: #d1e5f8;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 

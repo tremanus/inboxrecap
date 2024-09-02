@@ -123,17 +123,6 @@ const GmailApi = () => {
 
   return (
     <div className="gmail-api-container">
-      {status === 'unauthenticated' && (
-        <button onClick={authorize} className="authorize-button">
-          <b>Authorize Google Account</b>
-        </button>
-      )}
-      {session?.user?.email && (
-        <button disabled className="email-button">
-          {`Account: ${session.user.email}`}
-        </button>
-      )}
-      {status === 'authenticated' && (
         <div className="main-container">
           <div className="clear-container">
             <h1>Clear Your Inbox</h1>
@@ -199,7 +188,6 @@ const GmailApi = () => {
             )}
           </div>
         </div>
-      )}
     </div>
   );
 };
