@@ -1,24 +1,33 @@
+/* Import Plus Jakarta Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+/* Apply Plus Jakarta Sans font to the entire page */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
 /* Other styles */
 .home {
   padding: 20px 0;
-  padding-bottom: 0;
+  background-color: rgb(237, 240, 250);
+  margin-top: 80px;
 }
 
 .home-content {
   display: flex;
   flex-direction: column;
-  align-items: left; /* Center content horizontally */
-  justify-content: left; /* Center content vertically */
-  height: 600px; /* Ensure there's enough space for the content */
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  height: fit-content; /* Ensure there's enough space for the content */
   padding: 0 20px; /* Add padding to avoid content touching edges */
   box-sizing: border-box; /* Include padding in the element’s total width and height */
-  margin-left: 80px;
+  margin: 0; /* Remove left margin */
 }
 
 .home-content h1,
 .home-content p {
   max-width: 660px; /* Limit the maximum width of the text */
-  text-align: left; /* Align text to the left */
+  text-align: center; /* Center text horizontally */
 }
 
 .home-content h1 {
@@ -33,16 +42,14 @@
 }
 
 .home-content p.check {
-  color: #444; /* For cancel text */
+  color: #444; /* For check text */
   margin: 8px 0; /* Reduced vertical spacing */
-  margin-left: 5px;
 }
 
 .home-content p.cancel {
   color: #888; /* For cancel text */
   margin: 10px 0; /* Reduced vertical spacing */
   margin-top: 75px;
-  margin-left: 25px;
   font-size: 0.9rem;
 }
 
@@ -55,12 +62,11 @@
   font-weight: 600;
   cursor: pointer;
   border-radius: 25px; /* Increased border-radius for cylindrical look */
-  position: absolute; /* Positioning the button absolutely */
-  left: 100px; /* Adjusts the distance from the left edge of the screen */
+  position: relative; /* Change to relative positioning */
   text-align: center;
   transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  top: 620px;
+  margin-top: 20px; /* Adjust margin for spacing */
 }
 
 .try-button:hover {
@@ -69,89 +75,9 @@
 }
 
 .email-counter-container {
-  position: absolute; /* Absolute positioning */
-  top: 150px; /* Adjust as needed to move it up */
-  right: 150px; /* Adjust as needed to move it to the right */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-/* Features Section */
-.features {
-  padding: 20px 0;
-  border-radius: 8px;
-  height: 600px; /* Set height for the features section */
-}
-
-.features h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.features ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.features ul li {
-  margin: 10px 0;
-}
-
-/* Testimonials Section */
-.testimonials {
-  padding: 20px 0;
-  background-color: #eff7fd; /* Light background for the testimonials section */
-  height: 800px; /* Set height for the testimonials section */
-}
-
-.testimonials h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 3rem;
-}
-
-.testimonials h3 {
-  text-align: center;
-  margin-bottom: 50px;
-  font-weight: 400;
-  font-size: 1.1rem;
-}
-
-.testimonials blockquote {
-  margin: 20px auto;
-  padding: 20px;
-  border-left: 4px solid #007BFF;
-  background-color: #fff;
-  border-radius: 8px;
-  max-width: 600px;
-}
-
-.testimonials footer {
-  text-align: right;
-  font-style: italic;
-  margin-top: 10px;
-}
-
-.homepricing {
-  padding: 10px 20px;
-  background-color: #eff7fd;
-}
-
-.homepricing h1 {
-  text-align: center;
-  font-size: 4rem;
-  color: #333;
-  margin-bottom: 10px;
-  margin-top: 50px;
-}
-
-.homepricing h2 {
-  text-align: center;
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 10px;
-  margin-top: 30px;
-  font-weight: 400;
+  margin-top: 20px; /* Adjust margin for spacing */
 }

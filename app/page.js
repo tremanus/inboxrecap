@@ -1,6 +1,7 @@
 // app/page.js
-import Home from '../src/components/home'; // Adjust path if necessary
+
+import AuthCheck from '../src/components/AuthCheck'; // Adjust path if necessary
 
 export default function HomePage() {
-  return <Home />;
+  return <AuthCheck />;
 }

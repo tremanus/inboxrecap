@@ -1,0 +1,89 @@
+/* Import the font for the login page */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap');
+
+/* Apply font-family specifically to the login page */
+.login-page {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.left-section {
+  flex: 1;
+  background-color: #286dd5; /* Material-UI blue */
+  display: flex;
+  padding: 20px;
+  color: white;
+}
+
+.logo {
+  width: 60px; /* Adjust logo size as needed */
+  height: 60px;
+  margin: 52px 60px;
+  margin-right: 10px;
+}
+
+.left-section h1 {
+  font-size: 3rem; /* Adjusted font size */
+  margin: 50px 80px; /* Reset margin for proper centering */
+  margin-left: 0px;
+  display: flex;
+}
+
+.right-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 24px;
+  background-color: white;
+  box-shadow: -4px 0px 8px rgba(0, 0, 0, 0.1); /* Light shadow for separation */
+}
+
+.right-section h2 {
+  font-size: 1.5rem; /* Larger font size for prominence */
+  margin-bottom: 10px;
+  color: #333; /* Darker color for contrast */
+  font-weight: 800;
+}
+
+.right-section p {
+  margin-bottom: 24px; /* Increased spacing */
+  text-align: center;
+  color: #6f6262; /* Lighter gray for text */
+  font-weight: 400;
+}
+
+.button-google {
+  background-color: transparent;
+  color: black;
+  border: 0.5px solid black; /* Increased border width for better visibility */
+  border-radius: 4px;
+  padding: 10px 20px; /* Adjusted padding for better size */
+  width: 80%;
+  max-width: 600px; /* Set a max-width for better appearance */
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center; /* Center items vertically */
+  justify-content: center; /* Center items horizontally */
+  gap: 8px; /* Increased gap for spacing between icon and text */
+  font-weight: 500; /* Semi-bold text */
+  margin-bottom: 20px;
+}
+
+.button-google:hover {
+  background-color: #f6f8fa;
+}
+
+.terms-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}

@@ -2,14 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link'; // Use Next.js's Link component
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation'; // Import the useRouter hook
+import { signOut, useSession } from "next-auth/react";
+import { useRouter, usePathname } from 'next/navigation'; // Import the useRouter and usePathname hooks
 
 import './header.css'; // Ensure CSS is correctly imported
 
 const Header = () => {
   const { data: session } = useSession(); // Get the session data
   const router = useRouter(); // Initialize the useRouter hook
+  const pathname = usePathname(); // Get the current pathname
 
   const handleDashboardClick = () => {
     console.log('Dashboard button clicked');
@@ -22,12 +23,17 @@ const Header = () => {
   };
 
   const handleSignIn = () => {
-    signIn("google", { callbackUrl: '/dashboard' }); // Redirect to dashboard on login
+    router.push('/login'); // Redirect to login page
   };
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' }); // Redirect to homepage on logout
   };
+
+  // Do not render Header if on the /login page
+  if (pathname === '/login') {
+    return null;
+  }
 
   if (session) {
     return null;
@@ -43,7 +49,7 @@ const Header = () => {
         <ul>
           <li><Link href="/#features">Features</Link></li>
           <li><Link href="/pricing">Pricing</Link></li>
-          <li><Link href="/faq">FAQ</Link></li>
+          <li><Link href="/faq">FAQs</Link></li>
         </ul>
         {session ? (
           <>
