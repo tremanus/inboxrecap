@@ -5,7 +5,8 @@ import { useSession, signIn } from 'next-auth/react';
 import DashboardNav from './dashboardnav';
 import MobileDashboardNav from './mobiledashboardnav';
 import TopDashNav from './topdashnav'; // Make sure the path is correct
-import GmailApi from './gmailapi'; // Import GmailApi from gmailapi.js
+import TopSenders from './topsenders'; // Import only TopSenders
+import './clearinbox.css';
 import './designtest.css';
 
 const ClearInbox = () => {
@@ -34,7 +35,7 @@ const ClearInbox = () => {
   useEffect(() => {
     // Check screen size on component mount and resize
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 821); // Set 768px as breakpoint for mobile
+      setIsMobile(window.innerWidth < 821); // Set 821px as breakpoint for mobile
     };
 
     handleResize(); // Initial check
@@ -60,10 +61,10 @@ const ClearInbox = () => {
             <DashboardNav />
           )}
           <div className="main-content">
-            <div className="content-container">
-              <div className="top-row">
-                <div className="clear-emails-box">
-                  <GmailApi /> {/* Render the GmailApi component */}
+            <div className="c-container">
+              <div className="main-row">
+                <div className="top-senders-container">
+                  <TopSenders /> {/* Render the TopSenders component */}
                 </div>
               </div>
             </div>

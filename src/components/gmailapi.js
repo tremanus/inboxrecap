@@ -173,20 +173,6 @@ const GmailApi = () => {
               {deleting ? 'Moving to Trash...' : 'Delete Emails'}
             </button>
           </div>
-          <div className="summarize-container">
-            <h1>Clear & Summarize</h1>
-            <h2>Mark emails as read and receive one sentence recaps of each</h2>
-
-            <button onClick={summarizeLatestEmail} disabled={summarizing || loading}>
-              {summarizing ? 'Sending...' : 'Receive Daily Summary Email'}
-            </button>
-
-            {emailSent && (
-              <div className="email-sent-result">
-                <h3>{emailSent}</h3>
-              </div>
-            )}
-          </div>
         </div>
     </div>
   );

@@ -2,51 +2,80 @@ import { google } from 'googleapis';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
+async function getOAuthClientFromSession(session) {
+  if (!session || !session.user || !session.user.accessToken) {
+    console.error('No session or access token found');
+    return null;
+  }
+
+  const oauth2Client = new google.auth.OAuth2();
+  oauth2Client.setCredentials({
+    access_token: session.user.accessToken,
+  });
+
+  return oauth2Client;
+}
+
 export async function GET(request) {
   const session = await getServerSession(authOptions);
-
-  if (!session) {
+  const oauth2Client = await getOAuthClientFromSession(session);
+  
+  if (!oauth2Client) {
+    console.error('OAuth client not created');
     return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 });
   }
 
-  const accessToken = session.user.accessToken;
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({ access_token: accessToken });
-
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+  const url = new URL(request.url);
+  const timeRange = url.searchParams.get('timeRange') || 'last_week';
+  const startDate = getStartDateFromRange(timeRange);
+
+  let messages = [];
+  let nextPageToken = null;
+  const batchSize = 100; // Set appropriate batch size
 
   try {
-    // Fetch a list of emails
-    const response = await gmail.users.messages.list({
-      userId: 'me',
-      q: 'is:inbox', // Filter emails from the last 24 hours
-      maxResults: 100, // Limit the number of emails fetched initially
-    });
+    do {
+      const response = await gmail.users.messages.list({
+        userId: 'me',
+        q: `after:${startDate} is:inbox`,
+        pageToken: nextPageToken,
+        maxResults: batchSize,
+      });
 
-    const messages = response.data.messages;
+      console.log(`Fetched ${response.data.messages.length} messages.`);
 
-    if (!messages || messages.length === 0) {
+      messages = messages.concat(response.data.messages || []);
+      nextPageToken = response.data.nextPageToken;
+
+    } while (nextPageToken)
+
+    if (messages.length === 0) {
       return new Response(JSON.stringify({ message: 'No emails found' }), { status: 404 });
     }
 
-    // Use Promise.all to fetch email details in parallel
     const emailDetails = await Promise.all(messages.map(async (message) => {
-      const msg = await gmail.users.messages.get({
-        userId: 'me',
-        id: message.id,
-        format: 'metadata', // Fetch only metadata (headers)
-      });
-      return {
-        headers: msg.data.payload.headers,
-      };
+      try {
+        const msg = await gmail.users.messages.get({
+          userId: 'me',
+          id: message.id,
+          format: 'metadata',
+        });
+        return {
+          headers: msg.data.payload.headers,
+        };
+      } catch (error) {
+        console.error(`Failed to fetch message details for ID: ${message.id}`, error);
+        return null; // Handle errors gracefully
+      }
     }));
 
-    // Count emails per sender and collect unsubscribe links
     const senderCounts = {};
     const unsubscribeLinks = {};
-    emailDetails.forEach(({ headers }) => {
+    emailDetails.filter(Boolean).forEach(({ headers }) => {
       const sender = getHeaderValue(headers, 'From');
       const links = getUnsubscribeLinks(headers);
+
       if (sender) {
         senderCounts[sender] = (senderCounts[sender] || 0) + 1;
         if (links.length > 0) {
@@ -55,7 +84,6 @@ export async function GET(request) {
       }
     });
 
-    // Sort and slice top 10 senders
     const sortedSenders = Object.entries(senderCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
@@ -67,9 +95,30 @@ export async function GET(request) {
 
     return new Response(JSON.stringify(sortedSenders), { status: 200 });
   } catch (error) {
-    console.error('Error fetching email senders:', error);
+    console.error('Error fetching top senders:', error);
     return new Response(JSON.stringify({ message: 'Failed to fetch senders', error }), { status: 500 });
   }
+}
+
+function getStartDateFromRange(range) {
+  const now = new Date();
+  switch (range) {
+    case 'last_week':
+      now.setDate(now.getDate() - 7);
+      break;
+    case 'last_month':
+      now.setMonth(now.getMonth() - 1);
+      break;
+    case 'last_3_months':
+      now.setMonth(now.getMonth() - 3);
+      break;
+    case 'last_6_months':
+      now.setMonth(now.getMonth() - 6);
+      break;
+    default:
+      now.setMonth(now.getMonth() - 1);
+  }
+  return Math.floor(now.getTime() / 1000); // Gmail API requires a Unix timestamp
 }
 
 function getUnsubscribeLinks(headers) {

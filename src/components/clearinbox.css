@@ -1,0 +1,12 @@
+.main-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end; /* Align items to the right */
+  }
+  
+  /* Style for the TopSenders container */
+  .top-senders-container {
+    width: 100%; /* Make TopSenders take up 90% of the available width */
+    margin: 0 auto; /* Center the container horizontally with margin */
+    text-align: center;
+  }

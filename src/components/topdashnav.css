@@ -51,14 +51,15 @@
     display: flex; /* Use flexbox to align icons and text */
     align-items: center; /* Vertically center items */
     padding: 10px 16px;
-    cursor: pointer;
     font-size: 14px;
     color: #333;
 }
 
-.custom-dropdown-item:hover {
+.custom-dropdown-item:not(:first-child):hover {
     background-color: #f8f5f5;
+    cursor: pointer;
 }
+
 
 .custom-dropdown-item:first-child {
     border-bottom: 1px solid #c5c5c5;
