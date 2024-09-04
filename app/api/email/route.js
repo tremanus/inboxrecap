@@ -19,8 +19,7 @@ export async function GET(request) {
   try {
     const response = await gmail.users.messages.list({
       userId: 'me',
-      q: 'is:unread after:' + Math.floor(Date.now() / 1000 - 86400),
-      maxResults: 10, // Fetch up to 10 emails
+      q: 'is:unread newer_than:1d',
     });
 
     const messages = response.data.messages;

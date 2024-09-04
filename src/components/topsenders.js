@@ -5,7 +5,7 @@ const TopSenders = () => {
   const [senders, setSenders] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('last_month');
+  const [timeRange, setTimeRange] = useState('last_week');
 
   const fetchTopSenders = async () => {
     setLoading(true);
@@ -52,7 +52,10 @@ const TopSenders = () => {
       {error && <div className="error-message">Error: {error}</div>}
 
       {loading ? (
+      <div className="loading-container">
         <div className="loading-spinner"></div>
+        <p className="loading-message">Fetching your top senders...</p>
+      </div>
       ) : senders.length > 0 ? (
         <div className="table-container">
           <table className="senders-table">

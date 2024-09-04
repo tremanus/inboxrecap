@@ -61,7 +61,7 @@ const ClearInbox = () => {
             <DashboardNav />
           )}
           <div className="main-content">
-            <div className="c-container">
+            <div className="content-container">
               <div className="main-row">
                 <div className="top-senders-container">
                   <TopSenders /> {/* Render the TopSenders component */}

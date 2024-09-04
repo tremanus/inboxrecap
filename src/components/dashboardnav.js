@@ -30,7 +30,7 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
           onClick={() => handleNavClick('dashboard')}
         >
           <IconButton>
-            <Home style={{ color: 'black' }} />
+            <Home style={{ color: 'white' }} />
           </IconButton>
           Home
         </a>
@@ -39,7 +39,7 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
           onClick={() => handleNavClick('daily-recap')}
         >
           <IconButton>
-            <Replay style={{ color: 'black' }} />
+            <Replay style={{ color: 'white' }} />
           </IconButton>
           Daily Recap
         </a>
@@ -48,7 +48,7 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
           onClick={() => handleNavClick('clear-inbox')}
         >
           <IconButton>
-            <Inbox style={{ color: 'black' }} />
+            <Inbox style={{ color: 'white' }} />
           </IconButton>
           Clear Inbox
         </a>
@@ -57,7 +57,7 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
           onClick={() => handleNavClick('settings')}
         >
           <IconButton>
-            <Settings style={{ color: 'black' }} />
+            <Settings style={{ color: 'white' }} />
           </IconButton>
           Settings
         </a>
@@ -66,7 +66,7 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
           onClick={() => handleNavClick('billing')}
         >
           <IconButton>
-            <AttachMoney style={{ color: 'black' }} />
+            <AttachMoney style={{ color: 'white' }} />
           </IconButton>
           Billing
         </a>

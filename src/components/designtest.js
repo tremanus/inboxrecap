@@ -119,14 +119,14 @@ const Test = () => {
     isAuthenticated && (
         <>
          <TopDashNav />
-      <div className="dashboard-container">
-        {isMobile ? (
+         {isMobile ? (
           <MobileDashboardNav
           />
         ) : (
           <DashboardNav
           />
         )}
+      <div className="dashboard-container">
         <div className="main-content">
             <div className="content-container">
                 <div className="top-row">

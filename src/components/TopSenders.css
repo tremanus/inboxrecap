@@ -1,106 +1,106 @@
-/* Import "Plus Jakarta Sans" font */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
-
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.top-senders-container {
-  text-align: center;
-  max-width: 100%;
-  margin: 10px auto;
-  padding: 20px;
-  background-color: #fffbfb;
-  border-radius: 4px;
-  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
-}
-
-.time-range-selector {
-  display: inline-flex;
-  align-items: flex-end;
-  max-width: 80px;
-  margin: 5px auto;
-}
-
-.time-range-selector select {
-  border: none;
-  font-size: 0.8rem;
-  padding: 5px;
-  box-sizing: border-box;
-  outline: none;
-}
-
-.error-message {
-  color: red;
-}
-
-.loading-spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.table-container {
-  max-width: 100%;
-  overflow-x: auto;
-  margin-top: 20px;
-}
-
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  
+  .top-senders-container {
+    text-align: center;
+    max-width: 100%;
+    margin: 10px auto;
+    padding: 20px;
+    background-color: #fffbfb;
+    border-radius: 4px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .time-range-selector {
+    display: inline-flex;
+    align-items: flex-end;
+    max-width: 80px;
+    margin: 5px auto;
+  }
+  
+  .time-range-selector select {
+    border: none;
+    font-size: 0.8rem;
+    padding: 5px;
+    box-sizing: border-box;
+    outline: none;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .table-container {
+    max-width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+  }
+  
+  /* Ensure that the entire table follows a fixed layout */
 .senders-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0 auto;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 auto !important;
+    table-layout: fixed !important; /* Add this to enforce fixed column widths */
+}
+
+/* Set exact widths for columns */
+.senders-table th:nth-child(1), 
+.senders-table td:nth-child(1) {
+    width: 30%; /* "From" column */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+}
+
+.senders-table th:nth-child(2), 
+.senders-table td:nth-child(2) {
+    width: 20%; /* "Unsubscribe" column */
+}
+
+.senders-table th:nth-child(3), 
+.senders-table td:nth-child(3) {
+    width: 50%; /* "Count" column */
 }
 
 .senders-table th, .senders-table td {
-  padding: 12px;
-  border: 1px solid #ddd;
-  text-align: left;
-  font-weight: 400;
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-weight: 400;
+    white-space: nowrap; /* Prevent text from wrapping */
 }
-
-.senders-table th:nth-child(1), 
-.senders-table td:nth-child(1),
-.senders-table th:nth-child(3), 
-.senders-table td:nth-child(3) {
-  font-weight: 500; /* Set font weight to 500 for "From" and "Count" columns */
-}
-
-/* Reduce the width of the "From" column to 20% */
-.senders-table th:nth-child(1), 
-.senders-table td:nth-child(1) {
-  width: 20%;
-}
-
-.sender-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; /* Apply ellipsis if the content overflows */
-}
-
-.unsubscribe-cell {
-  text-align: center;
-}
-
-.unsubscribe-button {
-  text-transform: none;
-  border: none;
-  background: none;
-  color: blue;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-}
-
-.unsubscribe-button:hover {
-  text-decoration: underline;
-}
+  
+  .unsubscribe-cell {
+    text-align: center;
+  }
+  
+  .unsubscribe-button {
+    text-transform: none;
+    border: none;
+    background: none;
+    color: blue;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .unsubscribe-button:hover {
+    text-decoration: underline;
+  }
+  

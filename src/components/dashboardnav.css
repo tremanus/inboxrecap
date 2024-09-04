@@ -1,12 +1,14 @@
-/* Sidebar */
 .sidebar {
-    background-color: #e9ebf7; /* Light blue background */
-    color: #00131e; /* Darker blue for text */
-    width: 20%;
-    padding: 20px;
+    background-color: #11043f; /* Light blue background */
+    color: #fdfdfd; /* Darker blue for text */
+    width: 18%;
+    padding: 15px;
     display: flex;
+    height: 100vw;
+    position: fixed;
+    font-family: 'Heebo';
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin-top: -75px;
 }
 
@@ -18,11 +20,12 @@
 .nav-link {
     display: flex;
     align-items: center;
-    color: #00131e; /* Darker blue for text */
+    justify-content: flex-start;
+    color: #fdfdfd; /* Darker blue for text */
     text-decoration: none;
     margin: 5px 0;
     font-size: 1rem;
-    padding: 0px 10px;
+    padding: 0px;
     transition: color 0.3s, background-color 0.3s, font-weight 0.3s;
     border-radius: 5px;
 }
@@ -38,30 +41,30 @@
 }
 
 .nav-link:hover {
-    background-color: #c9d0df; /* Slightly darker blue for hover */
-    color: #00131e;; /* Keep text color consistent */
+    background-color: #1a2d55; /* Slightly darker blue for hover */
+    color: #fdfdfd;; /* Keep text color consistent */
     cursor: pointer;
 }
 
 .nav-link.active {
-    background-color: #80deea; /* Active state color */
+    background-color: #fdfdfd; /* Active state color */
     font-weight: bold; /* Emphasize active link */
 }
 
 .dash-logo {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-start;
     margin-bottom: 20px;
 }
 
 .dash-logo img {
     margin-right: 5px;
-    width: 50px;
+    width: 35px;
 }
 
 .dash-site-title {
-    font-size: 1.5rem;
-    color: #003b5c; /* Darker blue for title */
+    font-size: 1.4rem;
+    color: #fdfdfd; /* Darker blue for title */
     font-weight: 400;
 }

@@ -32,7 +32,7 @@ export async function GET(request) {
 
   let messages = [];
   let nextPageToken = null;
-  const batchSize = 100; // Set appropriate batch size
+  const batchSize = 500;
 
   try {
     do {
@@ -43,9 +43,10 @@ export async function GET(request) {
         maxResults: batchSize,
       });
 
-      console.log(`Fetched ${response.data.messages.length} messages.`);
-
-      messages = messages.concat(response.data.messages || []);
+      const fetchedMessages = response.data.messages || []; // Safeguard here
+      console.log(`Fetched ${fetchedMessages.length} messages.`);
+      
+      messages = messages.concat(fetchedMessages);
       nextPageToken = response.data.nextPageToken;
 
     } while (nextPageToken)
@@ -66,7 +67,7 @@ export async function GET(request) {
         };
       } catch (error) {
         console.error(`Failed to fetch message details for ID: ${message.id}`, error);
-        return null; // Handle errors gracefully
+        return null;
       }
     }));
 
@@ -76,11 +77,9 @@ export async function GET(request) {
       const sender = getHeaderValue(headers, 'From');
       const links = getUnsubscribeLinks(headers);
 
-      if (sender) {
+      if (sender && links.length > 0) {
         senderCounts[sender] = (senderCounts[sender] || 0) + 1;
-        if (links.length > 0) {
-          unsubscribeLinks[sender] = links;
-        }
+        unsubscribeLinks[sender] = links;
       }
     });
 
@@ -101,25 +100,26 @@ export async function GET(request) {
 }
 
 function getStartDateFromRange(range) {
-  const now = new Date();
-  switch (range) {
-    case 'last_week':
-      now.setDate(now.getDate() - 7);
-      break;
-    case 'last_month':
-      now.setMonth(now.getMonth() - 1);
-      break;
-    case 'last_3_months':
-      now.setMonth(now.getMonth() - 3);
-      break;
-    case 'last_6_months':
-      now.setMonth(now.getMonth() - 6);
-      break;
-    default:
-      now.setMonth(now.getMonth() - 1);
-  }
-  return Math.floor(now.getTime() / 1000); // Gmail API requires a Unix timestamp
-}
+    const now = new Date();
+    switch (range) {
+      case 'last_week':
+        now.setDate(now.getDate() - 7);
+        break;
+      case 'last_month':
+        now.setMonth(now.getMonth() - 1);
+        break;
+      case 'last_3_months':
+        now.setMonth(now.getMonth() - 3);
+        break;
+      case 'last_6_months':
+        now.setMonth(now.getMonth() - 6);
+        break;
+      default:
+        // Default to last week if the range is not recognized
+        now.setDate(now.getDate() - 7);
+    }
+    return Math.floor(now.getTime() / 1000); // Gmail API requires a Unix timestamp
+  }  
 
 function getUnsubscribeLinks(headers) {
   const unsubscribeHeader = headers.find(
@@ -127,10 +127,10 @@ function getUnsubscribeLinks(headers) {
   );
   if (unsubscribeHeader) {
     return unsubscribeHeader.value
-      .replace(/<|>/g, '') // Remove angle brackets
+      .replace(/<|>/g, '')
       .split(',')
       .map((link) => link.trim())
-      .filter(link => !link.startsWith('mailto:')); // Filter out mailto: links
+      .filter(link => !link.startsWith('mailto:'));
   }
   return [];
 }

@@ -6,8 +6,8 @@ import './footer.css'; // Import your CSS for styling
 const Footer = () => {
   const pathname = usePathname(); // Get the current pathname
 
-  // Do not render Footer if on the /login page
-  if (pathname === '/login') {
+  // Do not render Footer if on the /login, /dashboard, or /clear-inbox pages
+  if (pathname === '/login' || pathname === '/dashboard' || pathname === '/clear-inbox') {
     return null;
   }
 

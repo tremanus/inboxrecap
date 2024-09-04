@@ -1,7 +1,7 @@
 .custom-top-nav {
     display: flex;
     justify-content: flex-end; /* Align content to the right */
-    width: 80%; /* Set width to 80% */
+    width: 82%; /* Set width to 80% */
     height: 75px;
     background-color: #ffffff;
     border-bottom: 1px solid #e0e0e0;

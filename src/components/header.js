@@ -30,12 +30,8 @@ const Header = () => {
     signOut({ callbackUrl: '/' }); // Redirect to homepage on logout
   };
 
-  // Do not render Header if on the /login page
-  if (pathname === '/login') {
-    return null;
-  }
-
-  if (session) {
+  // Do not render Header if on the /login, /dashboard, or /clear-inbox pages
+  if (['/login', '/dashboard', '/clear-inbox'].includes(pathname)) {
     return null;
   }
 
