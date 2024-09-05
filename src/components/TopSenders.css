@@ -13,21 +13,24 @@ body {
   }
   
   .time-range-selector {
-    display: inline-flex;
-    align-items: flex-end;
-    width: 80%;
-    margin: 5px auto;
     display: flex;
-    flex-direction: row;
-  }
-  
-  .time-range-selector select {
+    align-items: center; /* Vertically align h2 and select */
+    justify-content: space-between; /* Push h2 to the left and select to the right */
+    width: 80%;
+}
+
+.time-range-selector h2 {
+    text-align: left;
+    margin-left: 5px;
+}
+
+.time-range-selector select {
     border: none;
     font-size: 0.8rem;
     padding: 5px;
     box-sizing: border-box;
     outline: none;
-  }
+}
   
   .error-message {
     color: red;
@@ -65,28 +68,37 @@ body {
 /* Set exact widths for columns */
 .senders-table th:nth-child(1), 
 .senders-table td:nth-child(1) {
-    width: 30%; /* "From" column */
+    width: 40%; /* "From" column */
     overflow: hidden; /* Hide overflow */
+    font-size: 14px;
     text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+    text-align: left;
 }
 
 .senders-table th:nth-child(2), 
 .senders-table td:nth-child(2) {
-    width: 20%; /* "Unsubscribe" column */
+    width: 30%;
+    text-align: left;
+    font-size: 14px;
 }
 
 .senders-table th:nth-child(3), 
 .senders-table td:nth-child(3) {
-    width: 50%; /* "Count" column */
+    width: 30%;
+    text-align: left;
 }
 
 .senders-table th, .senders-table td {
-    padding: 12px;
+    padding: 20px 12px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    text-align: left;
     font-weight: 400;
     white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.senders-table th {
+    font-weight: 600;
+    padding: 15px 12px;
 }
   
   .unsubscribe-cell {
@@ -99,13 +111,13 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background: none;
     padding: 10px;
-    color: blue;
+    color: rgb(43, 43, 250);
     font-weight: 600;
     cursor: pointer;
     padding: 0;
   }
   
   .unsubscribe-button:hover {
-    background-color: #f3f3f3;
+    color: rgb(0, 0, 177);
   }
   
