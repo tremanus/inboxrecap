@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Html, Head, Preview, Body, Container, Section, Img, Heading, Text, Link, Button } from '@react-email/components';
 
 const SummaryEmail = () => {
+  const [emails, setEmails] = useState([]);
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      try {
+        const response = await fetch('/api/email');
+        if (response.ok) {
+          const data = await response.json();
+          setEmails(data);
+        } else {
+          console.error('Failed to fetch emails:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching emails:', error);
+      }
+    };
+
+    fetchEmails();
+  }, []);
+
   return (
     <Html>
       <Head>
@@ -23,30 +43,42 @@ const SummaryEmail = () => {
             <Text style={introText}>
               Here’s what you missed in your inbox over the last 24 hours:
             </Text>
-            <Section style={emailItem}>
+            {emails.length > 0 ? (
+              emails.map((email, index) => (
+                <Section key={index} style={emailItem}>
+                  <Text style={emailDetails}>
+                    <strong>From:</strong> {email.sender}
+                  </Text>
+                  <Text style={emailDetails}>
+                    <strong>Subject:</strong> {email.subject}
+                  </Text>
+                  <Text style={emailSummary}>
+                    {email.snippet}
+                  </Text>
+                  <Button href={`https://mail.google.com/mail/u/0/#inbox/${email.id}`} style={viewButton}>
+                    View / Reply
+                  </Button>
+                  {email.unsubscribeLinks.length > 0 && (
+                    <Link href={email.unsubscribeLinks[0]} style={unsubscribe}>
+                      Unsubscribe
+                    </Link>
+                  )}
+                </Section>
+              ))
+            ) : (
               <Text style={emailDetails}>
-                <strong>From:</strong> sender@example.com
+                No new emails found in the last 24 hours.
               </Text>
-              <Text style={emailDetails}>
-                <strong>Subject:</strong> Placeholder Subject Line for Your Email
-              </Text>
-              <Text style={emailSummary}>
-                This is a placeholder summary for your email. It gives a brief overview of the content.
-              </Text>
-              <Button href="https://mail.google.com/mail/u/0/#inbox/messageId" style={viewButton}>
-                View / Reply
-              </Button>
-              <Link href="https://unsubscribe-link.com" style={unsubscribe}>
-                Unsubscribe
-              </Link>
-            </Section>
+            )}
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
               Best Regards,
-              InboxRecap
+            </Text>
+            <Text style={footerText}>
+                InboxRecap
             </Text>
             <Link href="https://inboxrecap.com" style={footerLink}>Visit Our Website</Link> | 
             <Link href="mailto:support@inboxrecap.com" style={footerLink}> Contact Support</Link>
@@ -147,7 +179,8 @@ const unsubscribe = {
   display: 'block',
   textAlign: 'center',
   marginTop: '15px',
-  fontSize: '12px',
+  fontSize: '14px',
+  fontWeight: '600',
   color: '#E74C3C',
   textDecoration: 'none',
 };
@@ -159,7 +192,7 @@ const footer = {
 };
 
 const footerText = {
-  fontSize: '14px',
+  fontSize: '16px',
   color: '#7F8C8D',
 };
 
@@ -167,6 +200,7 @@ const footerLink = {
   color: '#2980B9',
   textDecoration: 'none',
   fontWeight: 'bold',
+  fontSize: '14px',
 };
 
 export default SummaryEmail;

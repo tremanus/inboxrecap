@@ -41,6 +41,7 @@ const TopSenders = () => {
   return (
     <div className="top-senders-container">
       <div className="time-range-selector">
+      <h2>Top Senders</h2>
         <select id="timeRange" value={timeRange} onChange={handleTimeRangeChange}>
           <option value="last_week">Last Week</option>
           <option value="last_month">Last Month</option>
@@ -62,14 +63,15 @@ const TopSenders = () => {
             <thead>
               <tr>
                 <th>From:</th>
+                <th>Emails</th>
                 <th></th>
-                <th>Count</th>
               </tr>
             </thead>
             <tbody>
               {senders.map((sender, index) => (
                 <tr key={index}>
                   <td className="sender-name">{sender.sender}</td>
+                  <td>{sender.count}</td>
                   <td className="unsubscribe-cell">
                     {sender.unsubscribeLinks && sender.unsubscribeLinks.length > 0 && (
                       <button className="unsubscribe-button" onClick={() => handleUnsubscribe(sender.unsubscribeLinks[0])}>
@@ -77,7 +79,6 @@ const TopSenders = () => {
                       </button>
                     )}
                   </td>
-                  <td>{sender.count}</td>
                 </tr>
               ))}
             </tbody>
