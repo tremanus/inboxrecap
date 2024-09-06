@@ -50,6 +50,7 @@ export async function GET(request) {
           const summary = await getSummaryFromGPT(contentToSummarize);  // Summarize email content using GPT
 
           return {
+            id: message.id,
             snippet: msg.data.snippet,
             body: body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`,  // Fallback to subject and snippet
             unsubscribeLinks: getUnsubscribeLinks(headers),  // Extract unsubscribe links
@@ -60,6 +61,7 @@ export async function GET(request) {
         } catch (error) {
           console.error('Error fetching message content:', error);
           return {
+            id: message.id,
             snippet: message.snippet,
             body: `No Subject: ${message.snippet}`,  // Fallback to subject and snippet
             sender: 'Unknown',
