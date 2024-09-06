@@ -100,7 +100,7 @@ export const chartOptions = {
     padding: {
       top: 30,
       right: 0,
-      bottom: 20,
+      bottom: 21,
       left: 0,
     },
   },
