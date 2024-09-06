@@ -1,6 +1,7 @@
 import { google } from 'googleapis';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import * as cheerio from 'cheerio'; // Import Cheerio
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -19,7 +20,7 @@ export async function GET(request) {
   try {
     const response = await gmail.users.messages.list({
       userId: 'me',
-      q: 'is:unread newer_than:1d',
+      q: 'is:unread newer_than:3d',
     });
 
     const messages = response.data.messages;
@@ -29,21 +30,34 @@ export async function GET(request) {
     }
 
     const emailPromises = messages.map(async (message) => {
-      const msg = await gmail.users.messages.get({
-        userId: 'me',
-        id: message.id,
-        format: 'full',
-      });
-
-      const headers = msg.data.payload.headers;
-      return {
-        snippet: msg.data.snippet,
-        body: getPlainTextBody(msg.data.payload),
-        unsubscribeLinks: getUnsubscribeLinks(headers),
-        sender: getHeaderValue(headers, 'From'),
-        subject: getHeaderValue(headers, 'Subject'),
-      };
-    });
+        try {
+          const msg = await gmail.users.messages.get({
+            userId: 'me',
+            id: message.id,
+            format: 'full',
+          });
+      
+          const headers = msg.data.payload.headers;
+          const body = getVisibleText(msg.data.payload);
+      
+          return {
+            snippet: msg.data.snippet,
+            body: body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`,  // Fallback to subject and snippet
+            unsubscribeLinks: getUnsubscribeLinks(headers),  // Extract unsubscribe links
+            sender: getHeaderValue(headers, 'From'),  // Extract sender
+            subject: getHeaderValue(headers, 'Subject'),  // Extract subject
+          };
+        } catch (error) {
+          console.error('Error fetching message content:', error);
+          return {
+            snippet: message.snippet,
+            body: `No Subject: ${message.snippet}`,  // Fallback to subject and snippet
+            sender: 'Unknown',
+            subject: 'No Subject',
+            unsubscribeLinks: [],
+          };
+        }
+      });      
 
     const emailData = await Promise.all(emailPromises);
 
@@ -54,30 +68,52 @@ export async function GET(request) {
   }
 }
 
-function getPlainTextBody(payload) {
-  let body = '';
+// Helper function to extract visible text using Cheerio
+function getVisibleText(payload) {
+  let htmlContent = '';
+  let plainTextContent = '';
 
   if (payload.parts) {
-    for (const part of payload.parts) {
-      if (part.mimeType === 'text/plain' && part.body.data) {
-        body = Buffer.from(part.body.data, 'base64').toString('utf-8');
-        break;
+    payload.parts.forEach((part) => {
+      if (part.mimeType === 'text/html' && part.body?.data) {
+        htmlContent = Buffer.from(part.body.data, 'base64').toString('utf-8');
+      } else if (part.mimeType === 'text/plain' && part.body?.data) {
+        plainTextContent = Buffer.from(part.body.data, 'base64').toString('utf-8');
       } else if (part.mimeType === 'multipart/alternative' && part.parts) {
-        for (const subPart of part.parts) {
-          if (subPart.mimeType === 'text/plain' && subPart.body.data) {
-            body = Buffer.from(subPart.body.data, 'base64').toString('utf-8');
-            break;
+        part.parts.forEach((subPart) => {
+          if (subPart.mimeType === 'text/html' && subPart.body?.data) {
+            htmlContent = Buffer.from(subPart.body.data, 'base64').toString('utf-8');
+          } else if (subPart.mimeType === 'text/plain' && subPart.body?.data) {
+            plainTextContent = Buffer.from(subPart.body.data, 'base64').toString('utf-8');
           }
-        }
+        });
       }
-    }
-  } else if (payload.body && payload.body.data) {
-    body = Buffer.from(payload.body.data, 'base64').toString('utf-8');
+    });
   }
 
-  return body;
+  // Fallback to plain text if HTML is not available
+  if (!htmlContent && plainTextContent) {
+    return cleanUpText(plainTextContent);
+  }
+
+  if (!htmlContent) return ''; // Return empty if neither HTML nor plain text is available
+
+  // Use Cheerio to load the HTML and extract visible text
+  const $ = cheerio.load(htmlContent);
+  const visibleText = $('body').text().trim(); // Extract visible text from the body
+
+  return cleanUpText(visibleText);
 }
 
+// Function to clean up excessive line breaks and white spaces
+function cleanUpText(text) {
+  return text
+    .replace(/\n\s*\n/g, '\n') // Replace multiple newlines with a single one
+    .replace(/\s\s+/g, ' ')    // Replace multiple spaces with a single space
+    .trim();                   // Trim leading/trailing whitespace
+}
+
+// Function to extract unsubscribe links from headers
 function getUnsubscribeLinks(headers) {
   const unsubscribeHeader = headers.find(
     (header) => header.name.toLowerCase() === 'list-unsubscribe'
@@ -92,6 +128,7 @@ function getUnsubscribeLinks(headers) {
   return [];
 }
 
+// Function to get a specific header value
 function getHeaderValue(headers, name) {
   const header = headers.find(header => header.name === name);
   return header ? header.value : 'Unknown';

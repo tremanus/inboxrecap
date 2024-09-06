@@ -266,6 +266,9 @@
         text-align: center;
         margin: 0;
     }
+    .content-container {
+      width: 100%;
+    }
 }
 
 @media (max-width: 1142px) {
