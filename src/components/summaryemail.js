@@ -53,7 +53,7 @@ const SummaryEmail = () => {
                     <strong>Subject:</strong> {email.subject}
                   </Text>
                   <Text style={emailSummary}>
-                    {email.snippet}
+                    {email.summary}
                   </Text>
                   <Button href={`https://mail.google.com/mail/u/0/#inbox/${email.id}`} style={viewButton}>
                     View / Reply
@@ -159,7 +159,7 @@ const emailDetails = {
 
 const emailSummary = {
   fontSize: '14px',
-  color: '#7F8C8D',
+  color: '#383f40',
   marginBottom: '15px',
 };
 

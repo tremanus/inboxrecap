@@ -2,6 +2,12 @@ import { google } from 'googleapis';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import * as cheerio from 'cheerio'; // Import Cheerio
+import OpenAI from 'openai';  // Import OpenAI client
+
+// Initialize OpenAI client with API key
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -20,7 +26,7 @@ export async function GET(request) {
   try {
     const response = await gmail.users.messages.list({
       userId: 'me',
-      q: 'is:unread newer_than:3d',
+      q: 'is:unread newer_than:1d',
     });
 
     const messages = response.data.messages;
@@ -39,13 +45,17 @@ export async function GET(request) {
       
           const headers = msg.data.payload.headers;
           const body = getVisibleText(msg.data.payload);
-      
+          const contentToSummarize = body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`;
+
+          const summary = await getSummaryFromGPT(contentToSummarize);  // Summarize email content using GPT
+
           return {
             snippet: msg.data.snippet,
             body: body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`,  // Fallback to subject and snippet
             unsubscribeLinks: getUnsubscribeLinks(headers),  // Extract unsubscribe links
             sender: getHeaderValue(headers, 'From'),  // Extract sender
             subject: getHeaderValue(headers, 'Subject'),  // Extract subject
+            summary,  // Include GPT-4o-mini summary
           };
         } catch (error) {
           console.error('Error fetching message content:', error);
@@ -55,6 +65,7 @@ export async function GET(request) {
             sender: 'Unknown',
             subject: 'No Subject',
             unsubscribeLinks: [],
+            summary: 'Unable to summarize email content',
           };
         }
       });      
@@ -132,4 +143,22 @@ function getUnsubscribeLinks(headers) {
 function getHeaderValue(headers, name) {
   const header = headers.find(header => header.name === name);
   return header ? header.value : 'Unknown';
+}
+
+// Function to fetch the summary from GPT using OpenAI client
+async function getSummaryFromGPT(content) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',  // Use GPT-4o-mini
+      messages: [
+        { role: 'system', content: 'Making sure to capture the heart of the email, summarize this in one extremely concise sentence:' },
+        { role: 'user', content },
+      ],
+    });
+
+    return response.choices[0].message.content.trim();
+  } catch (error) {
+    console.error('Error fetching GPT summary:', error);
+    return 'Unable to summarize email content';
+  }
 }
