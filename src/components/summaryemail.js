@@ -1,27 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Html, Head, Preview, Body, Container, Section, Img, Heading, Text, Link, Button } from '@react-email/components';
 
-const SummaryEmail = () => {
-  const [emails, setEmails] = useState([]);
-
-  useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        const response = await fetch('/api/email');
-        if (response.ok) {
-          const data = await response.json();
-          setEmails(data);
-        } else {
-          console.error('Failed to fetch emails:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error fetching emails:', error);
-      }
-    };
-
-    fetchEmails();
-  }, []);
-
+const SummaryEmail = ({ emailData }) => {
   return (
     <Html>
       <Head>
@@ -43,8 +23,8 @@ const SummaryEmail = () => {
             <Text style={introText}>
               Here’s what you missed in your inbox over the last 24 hours:
             </Text>
-            {emails.length > 0 ? (
-              emails.map((email, index) => (
+            {emailData.length > 0 ? (
+              emailData.map((email, index) => (
                 <Section key={index} style={emailItem}>
                   <Text style={emailDetails}>
                     <strong>From:</strong> {email.sender}

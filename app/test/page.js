@@ -1,78 +1,47 @@
 'use client';
 
 import React, { useState } from 'react';
-import SummaryEmail from '../../src/components/summaryemail';
 
 const LastUnreadEmail = () => {
-  const [emails, setEmails] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
+  const [status, setStatus] = useState(null); // New state to handle status messages
+  const [sending, setSending] = useState(false); // New state to handle sending process
 
-  const fetchEmailData = async () => {
-    setLoading(true);
-    setError(null);
-    setShowSummary(false); // Reset the summary view when refetching
+  const sendDailySummary = async () => {
+    setSending(true);
+    setStatus(null); // Reset status before sending
+
     try {
-      const response = await fetch('/api/email');
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
       if (!response.ok) {
-        throw new Error('Failed to fetch emails');
+        throw new Error('Failed to send summary email');
       }
-      const data = await response.json();
-      setEmails(data);
-      setShowSummary(true); // Show the summary once emails are fetched
+
+      setStatus('Email Sent'); // Set status message on success
     } catch (error) {
-      setError(error.message);
+      setStatus(`Error: ${error.message}`);
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   };
 
   return (
     <div style={{ textAlign: 'center', maxWidth: '800px', margin: '100px auto' }}>
-      <h2>Unread Emails from the Last 24 Hours</h2>
+      <h2>Send Daily Summary Email</h2>
       <button 
-        onClick={fetchEmailData} 
+        onClick={sendDailySummary} 
         style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}
-        disabled={loading}
+        disabled={sending}
       >
-        {loading ? 'Loading...' : 'Fetch Emails'}
+        {sending ? 'Sending...' : 'Send Daily Summary'}
       </button>
 
-      {error && <div style={{ color: 'red' }}>Error: {error}</div>}
-
-      {showSummary ? (
-        <SummaryEmail emails={emails} />
-      ) : (
-        emails.length > 0 ? (
-          emails.map((email, index) => (
-            <div key={index} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '20px', margin: '20px auto', maxWidth: '600px' }}>
-              <p>
-                <strong>Sender:</strong> {email.sender}
-                {email.unsubscribeLinks.length > 0 && (
-                  <a 
-                    href={email.unsubscribeLinks[0]} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    style={{ marginLeft: '10px' }}
-                  >
-                    Unsubscribe
-                  </a>
-                )}
-              </p>
-              <p><strong>Subject:</strong> {email.subject}</p>
-              <p><strong>Snippet:</strong> {email.snippet}</p>
-              <textarea 
-                readOnly
-                value={email.body}
-                style={{ width: '100%', height: '150px', marginTop: '10px' }}
-              />
-            </div>
-          ))
-        ) : (
-          <p>No emails found</p>
-        )
-      )}
+      {status && <div style={{ marginTop: '20px', fontWeight: 'bold' }}>{status}</div>}
     </div>
   );
 };

@@ -51,7 +51,6 @@ export async function GET(request) {
 
           return {
             id: message.id,
-            snippet: msg.data.snippet,
             body: body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`,  // Fallback to subject and snippet
             unsubscribeLinks: getUnsubscribeLinks(headers),  // Extract unsubscribe links
             sender: getHeaderValue(headers, 'From'),  // Extract sender
@@ -62,7 +61,6 @@ export async function GET(request) {
           console.error('Error fetching message content:', error);
           return {
             id: message.id,
-            snippet: message.snippet,
             body: `No Subject: ${message.snippet}`,  // Fallback to subject and snippet
             sender: 'Unknown',
             subject: 'No Subject',
@@ -153,7 +151,7 @@ async function getSummaryFromGPT(content) {
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',  // Use GPT-4o-mini
       messages: [
-        { role: 'system', content: 'Making sure to capture the heart of the email, summarize this in one extremely concise sentence:' },
+        { role: 'system', content: 'Summarize the following email in one concise sentence. Only focus on the content of the email and avoid generic information::' },
         { role: 'user', content },
       ],
     });

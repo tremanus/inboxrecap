@@ -36,6 +36,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
     "react-router-dom": "^6.26.1",
+    "resend": "^4.0.0",
     "stripe": "^16.9.0"
   },
   "devDependencies": {
