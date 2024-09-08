@@ -19,7 +19,8 @@ body {
 }
 
 .container {
-  margin: 0 auto;
+  margin: 50px auto;
+  margin-bottom: 0px;
   padding: 4rem;
   width: 80%;
   flex: 1; /* Make the container grow and take available space */

@@ -51,12 +51,20 @@ export async function POST(request) {
     const profile = await gmail.users.getProfile({ userId: 'me' });
     const userEmail = profile.data.emailAddress;
 
-    const { category } = await request.json();
-    let query = 'is:unread';
+    const { sender, timeRange } = await request.json(); // Ensure these are correctly extracted
 
-    if (category === 'promotions') query += ' category:promotions';
-    else if (category === 'social') query += ' category:social';
-    else if (category === 'updates') query += ' category:updates';
+    // Generate query based on time range and sender
+    let query = 'is:unread from:' + sender;
+    
+    if (timeRange === 'last_week') {
+      query += ' after:' + getLastWeekDate();
+    } else if (timeRange === 'last_month') {
+      query += ' after:' + getLastMonthDate();
+    } else if (timeRange === 'last_3_months') {
+      query += ' after:' + getLastThreeMonthsDate();
+    } else if (timeRange === 'last_6_months') {
+      query += ' after:' + getLastSixMonthsDate();
+    }
 
     console.log('Query:', query);
 
@@ -145,4 +153,28 @@ export async function POST(request) {
     console.error('Error marking emails as read:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+function getLastWeekDate() {
+  const date = new Date();
+  date.setDate(date.getDate() - 7);
+  return date.toISOString().split('T')[0];
+}
+
+function getLastMonthDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 1);
+  return date.toISOString().split('T')[0];
+}
+
+function getLastThreeMonthsDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 3);
+  return date.toISOString().split('T')[0];
+}
+
+function getLastSixMonthsDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 6);
+  return date.toISOString().split('T')[0];
 }

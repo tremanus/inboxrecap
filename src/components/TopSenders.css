@@ -68,7 +68,7 @@ body {
 /* Set exact widths for columns */
 .senders-table th:nth-child(1), 
 .senders-table td:nth-child(1) {
-    width: 40%; /* "From" column */
+    width: 30%; /* "From" column */
     overflow: hidden; /* Hide overflow */
     font-size: 14px;
     text-overflow: ellipsis; /* Show ellipsis for overflowed text */
@@ -77,15 +77,23 @@ body {
 
 .senders-table th:nth-child(2), 
 .senders-table td:nth-child(2) {
-    width: 30%;
+    width: 20%;
     text-align: left;
     font-size: 14px;
 }
 
 .senders-table th:nth-child(3), 
 .senders-table td:nth-child(3) {
-    width: 30%;
+    width: 10%;
     text-align: left;
+    font-size: 14px;
+}
+
+.senders-table th:nth-child(4), 
+.senders-table td:nth-child(4) {
+    width: 40%;
+    text-align: left;
+    font-size: 14px;
 }
 
 .senders-table th, .senders-table td {
@@ -97,6 +105,7 @@ body {
 
 .senders-table th {
     font-weight: 600;
+    color: rgb(71, 68, 68);
     padding: 15px 32px;
     padding-top: 0px;
 }
@@ -111,13 +120,85 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background: none;
     padding: 10px;
-    color: rgb(43, 43, 250);
+    color: rgb(230, 21, 21);
     font-weight: 600;
     cursor: pointer;
     padding: 0;
   }
   
   .unsubscribe-button:hover {
-    color: rgb(0, 0, 177);
+    color: rgb(197, 33, 4);
+    font-weight: 800;
+  }
+
+  .unsubscribed-text {
+    color: #0f7811; /* Green */
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .mark-as-read-button {
+    background-color: #eeeeee; /* Green background */
+    border: none;
+    color: black; /* White text */
+    padding: 5px 8px; /* Padding around the text */
+    text-align: center; /* Center text */
+    text-decoration: none; /* No underline */
+    display: inline-block; /* Inline block display */
+    font-family: 'Plus Jakarta Sans';
+    font-weight: 600;
+    font-size: 14px; /* Font size */
+    margin-left: 20px;
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
   }
   
+  .mark-as-read-button:hover {
+    transform: scale(1.02); /* Slightly larger on hover */
+  }
+
+  .progress {
+    position: relative;
+    display: flex;
+    align-items: center; /* Center the percentage vertically */
+  }
+  
+  .progress-bar-container {
+    width: 70%; /* Use 70% width for the bar container */
+    background-color: #e5e3e4;
+    border-radius: 5px;
+    height: 10px;
+    margin-right: 10px; /* Space between the bar and percentage */
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background-color: #4caf50; /* Default green color */
+    border-radius: 5px;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  }
+  
+  .progress-percentage {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    min-width: 40px; /* Ensure the percentage is visible even for small numbers */
+  }
+  
+  .progress-bar-container:hover::after {
+    content: attr(title); /* Show additional info on hover */
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10; /* Ensure tooltip is above other content */
+  }

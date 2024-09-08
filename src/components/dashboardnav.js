@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useSession } from 'next-auth/react';
-import { Home, Replay, Inbox, Settings, AttachMoney } from '@mui/icons-material';
+import { Replay, Inbox, Settings, Payments, BarChart, QuestionAnswer } from '@mui/icons-material'; // Import BarChart icon
 import { IconButton } from '@mui/material';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 import './dashboardnav.css'; // Import CSS for styling
@@ -20,19 +20,19 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
 
   return (
     <div className="sidebar">
-      <div className="dash-logo">
+      <div className="dash-logo" onClick={() => handleNavClick('dashboard')} style={{ cursor: 'pointer' }}>
         <img src="/favicon.ico" alt="InboxRecap Logo" />
         <span className="dash-site-title">InboxRecap</span>
       </div>
       <div className="nav-links">
         <a 
-          className={getLinkClass('dashboard')} 
-          onClick={() => handleNavClick('dashboard')}
+          className={getLinkClass('clear-inbox')} 
+          onClick={() => handleNavClick('clear-inbox')}
         >
           <IconButton>
-            <Home style={{ color: 'white' }} />
+            <Inbox style={{ color: 'white' }} />
           </IconButton>
-          Home
+          Clear Inbox
         </a>
         <a 
           className={getLinkClass('daily-recap')} 
@@ -44,13 +44,31 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
           Daily Recap
         </a>
         <a 
-          className={getLinkClass('clear-inbox')} 
-          onClick={() => handleNavClick('clear-inbox')}
+          className={getLinkClass('analytics')} 
+          onClick={() => handleNavClick('dashboard')}
         >
           <IconButton>
-            <Inbox style={{ color: 'white' }} />
+            <BarChart style={{ color: 'white' }} /> {/* Use BarChart for Analytics */}
           </IconButton>
-          Clear Inbox
+          Analytics
+        </a>
+        <a 
+          className={getLinkClass('faq')} 
+          onClick={() => handleNavClick('faq')}
+        >
+          <IconButton>
+            <QuestionAnswer style={{ color: 'white' }} /> {/* Use BarChart for Analytics */}
+          </IconButton>
+          FAQs
+        </a>
+        <a 
+          className={getLinkClass('billing')} 
+          onClick={() => handleNavClick('billing')}
+        >
+          <IconButton>
+            <Payments style={{ color: 'white' }} />
+          </IconButton>
+          Billing
         </a>
         <a 
           className={getLinkClass('settings')} 
@@ -60,15 +78,6 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
             <Settings style={{ color: 'white' }} />
           </IconButton>
           Settings
-        </a>
-        <a 
-          className={getLinkClass('billing')} 
-          onClick={() => handleNavClick('billing')}
-        >
-          <IconButton>
-            <AttachMoney style={{ color: 'white' }} />
-          </IconButton>
-          Billing
         </a>
       </div>
     </div>
