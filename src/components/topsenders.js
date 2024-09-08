@@ -187,7 +187,7 @@ const TopSenders = () => {
                         className="mark-as-read-button" // Reuse the same className for styling
                         onClick={() => handleDeleteAll(sender.sender)}
                       >
-                        Delete All
+                        Delete
                       </button>
                       </div>
                     </td>
