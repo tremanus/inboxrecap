@@ -9,6 +9,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 async function getOAuthClientFromSession(session) {
   if (!session || !session.user || !session.user.accessToken) {
+    console.error('Session or access token not found');
     return null;
   }
 
@@ -38,24 +39,61 @@ async function getOAuthClientFromSession(session) {
 }
 
 export async function POST(request) {
+  console.log('POST request received at /api/move-to-trash');
+  
   try {
     const session = await getServerSession(authOptions);
-    const oauth2Client = await getOAuthClientFromSession(session);
+    console.log('Session:', session);
 
+    if (!session) {
+      console.error('No session found');
+      return NextResponse.json({ error: 'No session found' }, { status: 401 });
+    }
+
+    const oauth2Client = await getOAuthClientFromSession(session);
     if (!oauth2Client) {
-      return NextResponse.json({ error: 'No credentials found' }, { status: 401 });
+      console.error('OAuth client not found');
+      return NextResponse.json({ error: 'No OAuth client found' }, { status: 401 });
     }
 
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
     const profile = await gmail.users.getProfile({ userId: 'me' });
     const userEmail = profile.data.emailAddress;
 
-    const { category } = await request.json();
-    let query = 'is:unread';
+    console.log('User email:', userEmail);
 
-    if (category === 'promotions') query += ' category:promotions';
-    else if (category === 'social') query += ' category:social';
-    else if (category === 'updates') query += ' category:updates';
+    const { sender, timeRange } = await request.json();
+    console.log('Received parameters:', { sender, timeRange });
+
+    let query = `from:${sender}`;
+    
+    if (timeRange) {
+      const now = new Date();
+      let startDate = new Date();
+
+      switch (timeRange) {
+        case 'last_week':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'last_month':
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case 'last_3_months':
+          startDate.setMonth(now.getMonth() - 3);
+          break;
+        case 'last_6_months':
+          startDate.setMonth(now.getMonth() - 6);
+          break;
+        default:
+          console.error('Invalid time range:', timeRange);
+          return NextResponse.json({ error: 'Invalid time range' }, { status: 400 });
+      }
+
+      const formattedDate = startDate.toISOString().split('T')[0]; // Format YYYY-MM-DD
+      query += ` after:${formattedDate}`;
+    }
+
+    console.log('Gmail query:', query);
 
     let pageToken = null;
     let totalMessagesProcessed = 0;
@@ -70,6 +108,7 @@ export async function POST(request) {
       });
 
       const messageIds = response.data.messages ? response.data.messages.map(message => message.id) : [];
+      console.log('Messages found:', messageIds.length);
 
       if (messageIds.length > 0) {
         await Promise.all(
@@ -81,6 +120,7 @@ export async function POST(request) {
           )
         );
         totalMessagesProcessed += messageIds.length;
+        console.log('Messages moved to trash:', messageIds.length);
       }
 
       pageToken = response.data.nextPageToken;
@@ -121,6 +161,7 @@ export async function POST(request) {
       }
     }
 
+    console.log('Successfully moved emails to trash and updated Supabase');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error moving emails to trash:', error);

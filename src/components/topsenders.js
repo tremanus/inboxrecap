@@ -77,6 +77,28 @@ const TopSenders = () => {
     } catch (err) {
       console.error('Failed to mark as read:', err.message);
     }
+  };
+  
+  const handleDeleteAll = async (senderEmail) => {
+    try {
+      const response = await fetch('/api/movetotrash', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ deleteAll: true, timeRange: timeRange, sender: senderEmail }), // Remove sender if not needed
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete all emails');
+      }
+  
+      const data = await response.json();
+      console.log('Deleted all emails successfully:', data);
+      fetchTopSenders();
+    } catch (err) {
+      console.error('Failed to delete all emails:', err.message);
+    }
   };  
 
   const handleTimeRangeChange = (event) => {
@@ -144,6 +166,7 @@ const TopSenders = () => {
                     </td>
                     <td className="total-emails-cell">{sender.count}</td>
                     <td className="actions-cell">
+                      <div class="button-container">
                       {sender.unsubscribeLinks && sender.unsubscribeLinks.length > 0 && !sender.unsubscribed ? (
                         <button
                           className="unsubscribe-button"
@@ -160,6 +183,13 @@ const TopSenders = () => {
                       >
                         Mark as Read
                       </button>
+                      <button
+                        className="mark-as-read-button" // Reuse the same className for styling
+                        onClick={() => handleDeleteAll(sender.sender)}
+                      >
+                        Delete All
+                      </button>
+                      </div>
                     </td>
                   </tr>
                 );
