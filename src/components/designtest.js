@@ -40,7 +40,7 @@ const Test = () => {
   useEffect(() => {
     // Check screen size on component mount and resize
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 821); // Set 768px as breakpoint for mobile
+      setIsMobile(window.innerWidth < 1027); // Set 768px as breakpoint for mobile
     };
 
     handleResize(); // Initial check

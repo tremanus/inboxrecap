@@ -242,14 +242,14 @@
 }
 
 /* Hide mobile nav on larger screens */
-@media (min-width: 822px) {
+@media (min-width: 1028px) {
     .mobile-dashboard-nav {
       display: none;
     }
 }
 
 /* Show mobile nav and hide desktop nav on smaller screens */
-@media (max-width: 821px) {
+@media (max-width: 1027px) {
     .dashboard-nav {
       display: none;
     }
@@ -259,7 +259,6 @@
     }
 
     .main-content {
-        margin-top: 250px;
         padding: 10px;
     }
     
