@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useSession } from 'next-auth/react';
-import { Replay, Inbox, Settings, Payments, BarChart, QuestionAnswer } from '@mui/icons-material'; // Import BarChart icon
+import { Replay, Inbox, Settings, Payments, BarChart, QuestionAnswer, DeleteSweep } from '@mui/icons-material'; // Import BarChart icon
 import { IconButton } from '@mui/material';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 import './dashboardnav.css'; // Import CSS for styling
@@ -33,6 +33,15 @@ const DashboardNav = ({ selectedSection, userEmail }) => {
             <Inbox style={{ color: 'white' }} />
           </IconButton>
           Clear Inbox
+        </a>
+        <a 
+          className={getLinkClass('mass-delete')} 
+          onClick={() => handleNavClick('mass-delete')}
+        >
+          <IconButton>
+            <DeleteSweep style={{ color: 'white' }} />
+          </IconButton>
+          Mass Delete
         </a>
         <a 
           className={getLinkClass('daily-recap')} 

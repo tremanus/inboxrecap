@@ -41,7 +41,7 @@ const GmailApi = () => {
     setMarkingAsRead(true);
     setError(null);
     try {
-      const response = await fetch('/api/mark-as-read', {
+      const response = await fetch('/api/markasread', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const GmailApi = () => {
     setDeleting(true);
     setError(null);
     try {
-      const response = await fetch('/api/movetotrash', {
+      const response = await fetch('/api/move-to-trash', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -31,7 +31,7 @@ const Header = () => {
   };
 
   // Do not render Header if on the /login, /dashboard, or /clear-inbox pages
-  if (['/login', '/dashboard', '/clear-inbox', '/daily-recap'].includes(pathname)) {
+  if (['/login', '/dashboard', '/clear-inbox', '/daily-recap', '/mass-delete'].includes(pathname)) {
     return null;
   }
 

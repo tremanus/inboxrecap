@@ -7,7 +7,7 @@ const Footer = () => {
   const pathname = usePathname(); // Get the current pathname
 
   // Do not render Footer if on the /login, /dashboard, or /clear-inbox pages
-  if (pathname === '/login' || pathname === '/dashboard' || pathname === '/clear-inbox' || pathname === '/daily-recap') {
+  if (pathname === '/login' || pathname === '/dashboard' || pathname === '/clear-inbox' || pathname === '/daily-recap' || pathname === '/mass-delete') {
     return null;
   }
 
