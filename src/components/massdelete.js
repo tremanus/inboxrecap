@@ -34,7 +34,7 @@ const MassDelete = () => {
   useEffect(() => {
     // Check screen size on component mount and resize
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 821); // Set 821px as breakpoint for mobile
+      setIsMobile(window.innerWidth < 1027); // Set 821px as breakpoint for mobile
     };
 
     handleResize(); // Initial check
@@ -53,12 +53,12 @@ const MassDelete = () => {
     isAuthenticated && (
       <>
         <TopDashNav />
-        <div className="dashboard-container">
           {isMobile ? (
             <MobileDashboardNav />
           ) : (
             <DashboardNav />
           )}
+          <div className="dashboard-container">
           <div className="main-content">
             <div className="content-container">
               <div className="main-row">

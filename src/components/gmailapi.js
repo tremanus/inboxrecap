@@ -125,7 +125,7 @@ const GmailApi = () => {
     <div className="gmail-api-container">
         <div className="main-container">
           <div className="clear-container">
-            <h1>Clear Your Inbox</h1>
+            <h1>Mass Delete & Mark as Read</h1>
             <h2>Clean up your unwanted emails and save storage</h2>
 
             <div className="selectors-container">
