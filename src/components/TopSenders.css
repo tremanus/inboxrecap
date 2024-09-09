@@ -211,3 +211,50 @@ body {
     white-space: nowrap;
     z-index: 10; /* Ensure tooltip is above other content */
   }
+
+  @media (max-width: 800px) {
+    .button-container {
+      position: absolute;
+      margin: 20px auto;
+      left: 50px;
+    }
+    .senders-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin: 0 auto !important;
+      table-layout: fixed !important; /* Add this to enforce fixed column widths */
+  }
+  
+  /* Set exact widths for columns */
+  .senders-table th:nth-child(1), 
+  .senders-table td:nth-child(1) {
+      width: 40%; /* "From" column */
+      overflow: hidden; /* Hide overflow */
+      font-size: 14px;
+      text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+      text-align: left;
+  }
+  
+  .senders-table th:nth-child(2), 
+  .senders-table td:nth-child(2) {
+      width: 35%;
+      text-align: left;
+      font-size: 14px;
+  }
+  
+  .senders-table th:nth-child(3), 
+  .senders-table td:nth-child(3) {
+      width: 25%;
+      text-align: left;
+      font-size: 14px;
+  }
+  .senders-table th:nth-child(4), 
+.senders-table td:nth-child(4) {
+    width: 0%;
+    text-align: left;
+    font-size: 14px;
+}
+.senders-table td {
+  padding-bottom: 50px;
+}
+  }

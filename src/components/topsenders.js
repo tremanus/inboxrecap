@@ -138,7 +138,7 @@ const TopSenders = () => {
               <tr>
                 <th>From:</th>
                 <th>Read</th>
-                <th>Total Emails</th>
+                <th>Emails</th>
                 <th></th> {/* Unsubscribe and Mark as Read button column */}
               </tr>
             </thead>
