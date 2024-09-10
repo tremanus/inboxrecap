@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import EmailCounter from './emailcounter';
 import FAQ from './faq';
 import Pricing from './pricing';
+import Features from './features';
 import './home.css'; // Ensure the CSS file is correctly imported
 
 const Home = () => {
@@ -35,6 +36,7 @@ const Home = () => {
           <EmailCounter />
         </div>
       </div>
+      <Features />
       <Pricing />
       <FAQ  />
     </section>

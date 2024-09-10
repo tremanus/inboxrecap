@@ -40,7 +40,7 @@ const Header = () => {
         <ul>
           <li><Link href="#features">Features</Link></li>
           <li><Link href="#pricing">Pricing</Link></li>
-          <li><Link href="#faq">FAQs</Link></li>
+          <li><Link href="#faq">FAQ</Link></li>
         </ul>
         {session ? (
           <>

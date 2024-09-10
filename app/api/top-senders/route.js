@@ -50,7 +50,7 @@ export async function GET(request) {
 
   let messages = [];
   let nextPageToken = null;
-  const batchSize = 500;
+  const batchSize = 1000;
 
   try {
     do {
