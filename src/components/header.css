@@ -74,11 +74,11 @@ header {
     text-align: center;
     transition: background-color 0.3s ease;
     border: 0.5px solid #333;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
   
   .login-button:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
   }
 
   .signup-button {
@@ -93,14 +93,18 @@ header {
     margin-left: 10px;
     text-align: center;
     transition: background-color 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
   
   .signup-button:hover {
-    background: #5caaf3;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
   }
   
   html {
     scroll-behavior: smooth;
   }  
+
+  div {
+    scroll-margin-top: 100px; /* Adjust based on your header height */
+  }
+  

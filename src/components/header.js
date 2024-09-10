@@ -17,11 +17,6 @@ const Header = () => {
     router.push('/dashboard'); // Redirect to the dashboard
   };
 
-  const handlePricingClick = () => {
-    console.log('Pricing button clicked');
-    router.push('/pricing'); // Redirect to pricing
-  };
-
   const handleSignIn = () => {
     router.push('/login'); // Redirect to login page
   };
@@ -43,9 +38,9 @@ const Header = () => {
       </Link>
       <nav>
         <ul>
-          <li><Link href="/#features">Features</Link></li>
-          <li><Link href="/pricing">Pricing</Link></li>
-          <li><Link href="/faq">FAQs</Link></li>
+          <li><Link href="#features">Features</Link></li>
+          <li><Link href="#pricing">Pricing</Link></li>
+          <li><Link href="#faq">FAQs</Link></li>
         </ul>
         {session ? (
           <>
@@ -55,7 +50,7 @@ const Header = () => {
         ) : (
           <>
             <button className="login-button" onClick={handleSignIn}>Login</button>
-            <button className="signup-button" onClick={handlePricingClick}>Try For Free</button>
+            <button className="signup-button" onClick={handleSignIn}>Try For Free</button>
           </>
         )}
       </nav>

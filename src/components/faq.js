@@ -1,48 +1,78 @@
 "use client";
+
 import React, { useEffect } from "react";
-import "./faq.css"; // Make sure to update your CSS file to match the styles
+import * as Accordion from "@radix-ui/react-accordion";
+import { ChevronDownIcon } from "@radix-ui/react-icons"; // Radix Chevron Icon
+import Box from '@mui/joy/Box';
+import Button from '@mui/joy/Button';
+import Typography from '@mui/joy/Typography';
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
+import "./faq.css";
 
 const FAQ = () => {
   useEffect(() => {
     document.title = "FAQ | InboxRecap";
   }, []);
 
-  // JavaScript to handle accordion toggle
-  const toggleAccordion = (e) => {
-    const button = e.currentTarget;
-    const isExpanded = button.getAttribute("aria-expanded") === "true";
-
-    // Collapse all items
-    const allButtons = document.querySelectorAll(".accordion-item button");
-    allButtons.forEach((btn) => btn.setAttribute("aria-expanded", "false"));
-
-    // Expand clicked item if it was not expanded
-    if (!isExpanded) {
-      button.setAttribute("aria-expanded", "true");
-    }
-  };
-
   return (
+    <div id='faq'>
+    <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            mt: 8,
+            mb: 3, // Margin bottom to separate from the cards
+          }}
+        >
+          <Button
+            sx={{
+              backgroundColor: '#6ebef7',
+              color: 'black',
+              borderRadius: '25px',
+              padding: '8px 16px',
+              fontSize: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              textTransform: 'none',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            }}
+            startDecorator={<QuestionAnswerOutlinedIcon sx={{ color: 'black', mr: 0.5 }} />} // Set icon color to black
+            disabled // Make the button unclickable
+          >
+            <Typography sx={{ color: 'black' }}>FAQ</Typography>
+          </Button>
+        </Box>
     <div className="container">
-      <p>InboxRecap Common FAQs</p>
+      <div className='faq-left'>
       <h1>Frequently Asked Questions</h1>
-      <div className="accordion">
-        {faqItems.map((item, index) => (
-          <div className="accordion-item" key={index}>
-            <button
-              id={`accordion-button-${index}`}
-              aria-expanded="false"
-              onClick={toggleAccordion}
-            >
-              <span className="accordion-title">{item.question}</span>
-              <span className="icon" aria-hidden="true"></span>
-            </button>
-            <div className="accordion-content">
-              <p>{item.answer}</p>
-            </div>
-          </div>
-        ))}
+      <p>Any other questions? Shoot us an email <a href='mailto:support@inboxrecap.com'>here.</a></p>
       </div>
+      <Accordion.Root
+        type="single"
+        collapsible
+        className="AccordionRoot"
+      >
+        {faqItems.map((item, index) => (
+          <Accordion.Item
+            key={index}
+            value={`item-${index}`}
+            className="AccordionItem"
+          >
+            <Accordion.Header className="AccordionHeader">
+              <Accordion.Trigger className="AccordionTrigger">
+                <span className="accordion-title">{item.question}</span>
+                <ChevronDownIcon className="AccordionChevron" aria-hidden />
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content className="AccordionContent">
+              <div className="AccordionContentText">
+                {item.answer}
+              </div>
+            </Accordion.Content>
+          </Accordion.Item>
+        ))}
+      </Accordion.Root>
+    </div>
     </div>
   );
 };

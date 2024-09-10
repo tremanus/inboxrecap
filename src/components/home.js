@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import EmailCounter from './emailcounter';
+import FAQ from './faq';
+import Pricing from './pricing';
 import './home.css'; // Ensure the CSS file is correctly imported
 
 const Home = () => {
@@ -13,25 +15,28 @@ const Home = () => {
   }, []);
 
   const handlePricingClick = () => {
-    router.push('/pricing'); // Use router.push for navigation
+    router.push('/login'); // Use router.push for navigation
+  };
+
+  const handleViewPlansClick = () => {
+    router.push('#pricing'); // Navigate to pricing page
   };
 
   return (
     <section className="home">
       <div className="home-content">
-        <h1>Manage your mail efficiently</h1>
-        <h2>Receive AI-powered daily recaps of your inbox</h2>
-        <p><b>Don't waste countless hours going through all of your emails:</b></p>
-        <p className="check">✅ Mark your unread emails from the last day as read</p>
-        <p className="check">✅ Summarize each email in one sentence</p>
-        <p className="check">✅ Receive all the summaries in one daily email</p>
-        <p className="check">✅ Mass delete emails & unsubscribe from mailing lists</p>
-        <button className="try-button" onClick={handlePricingClick}>Try For Free</button>
-        <p className="cancel">Cancel anytime</p>
+        <h1>Manage your email efficiently</h1>
+        <h2>Receive AI-powered recaps of your inbox</h2>
+        <div className="button-container">
+          <button className="view-plans-button" onClick={handleViewPlansClick}>View plans</button>
+          <button className="try-button" onClick={handlePricingClick}>Try for free</button>
+        </div>
         <div className="email-counter-container">
           <EmailCounter />
         </div>
       </div>
+      <Pricing />
+      <FAQ  />
     </section>
   );
 };

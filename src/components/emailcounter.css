@@ -15,50 +15,29 @@
 
 .email-counter-item {
     position: relative;
-    margin: 20px;
+    margin: 10px;
 }
 
 .email-icon {
-    width: 140px;
-    height: 140px;
+    width: 80px;
+    height: 80px;
 }
 
 .gmail-icon {
-    width: 160px;
-    height: 140px;
-    border-radius: 60px;
-}
-
-.small-icon .count-display {
-    margin-top: 50px;
-}
-
-.small-icon .email-icon {
-    width: 100px; /* Smaller size when countdown ends */
-    height: 100px; /* Smaller size when countdown ends */
-    margin-top: 50px;
-}
-
-.small-icon .gmail-icon {
-    width: 120px; /* Smaller size when countdown ends */
-    height: 100px; /* Smaller size when countdown ends */
-    border-radius: 60px;
-    margin-top: 50px;
-}
-
-.small-icon #outlook {
-    margin-right: 50px;
-    margin-left: -10px;
+    width: 95px;
+    height: 80px;
+    border-radius: 40px;
+    margin-right: -10px;
 }
 
 .count-display {
     position: absolute;
-    top: -8px;
-    right: 2px;
-    padding: 4px 12px;
+    top: -4px;
+    right: -4px;
+    padding: 3px 9px;
     background-color: #f00;
     color: white;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     font-weight: 500;
     border-radius: 20px;
     display: flex;
@@ -66,24 +45,4 @@
     justify-content: center;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     animation: bounce 1s infinite;
-}
-
-.down-arrow {
-    position: absolute;
-    top: 150px;
-    right: 235px;
-    font-size: 10rem;
-    color: rgb(16, 201, 16);
-    opacity: 0;
-    transition: opacity 0.5s ease-in;
-}
-
-.second-set {
-    margin-top: 140px;
-    opacity: 0;
-    transition: opacity 0.5s ease-in;
-}
-
-.second-set #outlook {
-    margin-left: -15px;
 }

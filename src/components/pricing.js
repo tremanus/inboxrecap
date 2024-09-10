@@ -1,161 +1,237 @@
-"use client"; // Add this directive to mark this file as a client component
+import * as React from 'react';
+import Box from '@mui/joy/Box';
+import Button from '@mui/joy/Button';
+import Card from '@mui/joy/Card';
+import CardActions from '@mui/joy/CardActions';
+import Chip from '@mui/joy/Chip';
+import Divider from '@mui/joy/Divider';
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
+import ListItemDecorator from '@mui/joy/ListItemDecorator';
+import Typography from '@mui/joy/Typography';
+import Check from '@mui/icons-material/Check';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 
-import React, { useState, useEffect } from 'react';
-import './pricing.css';
-import { useAuth0 } from '@auth0/auth0-react';
-
-const Pricing = () => {
-  const { isAuthenticated, user, loginWithRedirect } = useAuth0();
-  const [isYearly, setIsYearly] = useState(false);
-  const [redirectLink, setRedirectLink] = useState('');
-
-  useEffect(() => {
-    document.title = "Pricing | InboxRecap";
-  }, []);
-
-  useEffect(() => {
-    if (isAuthenticated && redirectLink) {
-      const prefilledLink = `${redirectLink}?prefilled_email=${encodeURIComponent(user.email)}`;
-      window.location.href = prefilledLink;
-    }
-  }, [isAuthenticated, redirectLink, user]);
-
-  const togglePlan = () => {
-    setIsYearly(prevState => !prevState);
-  };
-
-  const monthlyPlans = [
-    {
-      name: "Personal",
-      price: "$7",
-      features: [
-        "Email summarization powered by GPT-4",
-        "Connect to 1 email account",
-        "Up to 100 emails summarized per day",
-        "Standard support"
-      ],
-      link: "https://buy.stripe.com/test_3cscNh736gdp70Q7ss"
-    },
-    {
-      name: "Basic",
-      price: "$14",
-      features: [
-        "Email summarization powered by GPT-4",
-        "Connect to 3 email accounts",
-        "Up to 500 total emails summarized per day",
-        "Priority support"
-      ],
-      link: "https://buy.stripe.com/test_cN23cH4UY3qD70Q9AG"
-    },
-    {
-      name: "Professional",
-      price: "$19",
-      features: [
-        "Advanced email summarization powered by GPT-4",
-        "Connect to up to 5 email accounts",
-        "Unlimited summary emails",
-        "Dedicated support"
-      ],
-      link: "https://buy.stripe.com/test_8wM8x13QU3qD1GwbIQ"
-    }
-  ];
-
-  const yearlyPlans = monthlyPlans.map(plan => ({
-    ...plan,
-    originalPrice: plan.price,
-    discountedPrice: `$${Math.round(parseFloat(plan.price.slice(1)) * 0.8)}`,
-    billedYearly: `$${Math.round(parseFloat(plan.price.slice(1)) * 12 * 0.8)}`,
-    saveAmount: `$${Math.round(parseFloat(plan.price.slice(1)) * 12 * 0.2)}`,
-    link: plan.name === "Personal"
-      ? "https://buy.stripe.com/test_aEUcNhfzCd1d98YfYZ"
-      : plan.name === "Basic"
-      ? "https://buy.stripe.com/test_eVa3cH9be2mzad23cj"
-      : "https://buy.stripe.com/test_eVa8x1afi4uH70QbIR"
-  }));
-
-  const plansToDisplay = isYearly ? yearlyPlans : monthlyPlans;
-
-  const handleSignup = (link) => {
-    if (isAuthenticated) {
-      const prefilledLink = `${link}?prefilled_email=${encodeURIComponent(user.email)}`;
-      window.location.href = prefilledLink;
-    } else {
-      setRedirectLink(link);
-      loginWithRedirect({
-        redirectUri: `${window.location.origin}/pricing`
-      });
-    }
-  };
-
+export default function Pricing() {
   return (
-    <section className="pricing">
-      <h1>Organize Your Inbox</h1>
-      <h2>Select the plan that best suits your needs. Upgrade or cancel anytime.</h2>
-      <div className="pricing-toggle">
-        <button
-          className={`toggle-button ${!isYearly ? 'active' : ''}`}
-          onClick={togglePlan}
+    <div id='pricing'>
+    <Box
+      sx={{
+        textAlign: 'center',
+        mt: 15,
+        mb: 20,
+      }}
+    >
+      <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            mb: 3, // Margin bottom to separate from the cards
+          }}
         >
-          Monthly
-        </button>
-        <button
-          className={`toggle-button ${isYearly ? 'active' : ''}`}
-          onClick={togglePlan}
+          <Button
+            sx={{
+              backgroundColor: '#6ebef7',
+              color: 'black',
+              borderRadius: '25px',
+              padding: '8px 16px',
+              fontSize: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              textTransform: 'none',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            }}
+            startDecorator={<PaymentsOutlinedIcon sx={{ color: 'black', mr: 0.5 }} />} // Set icon color to black
+            disabled // Make the button unclickable
+          >
+            <Typography sx={{ color: 'black' }}>Pricing</Typography>
+          </Button>
+        </Box>
+      <Typography level="h1" sx={{ mb: 4, fontSize: '4rem' }}>
+        Organize Your Inbox
+      </Typography>
+      <Typography level="body1" sx={{ mb: 8, fontSize: '1.2rem' }}>
+        Select the plan that best suits your needs. Upgrade or cancel anytime.
+      </Typography>
+      
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Free Plan Card */}
+        <Card
+          size="lg"
+          variant="outlined"
+          sx={{ width: 350, maxWidth: '100%' }}
         >
-          Yearly - <b>20% Off</b>
-        </button>
-      </div>
-      <div className="pricing-plans">
-        {plansToDisplay.map((plan, index) => {
-          const featuresArray = plan.features || [];
-          const featureList = Array.isArray(featuresArray) ? featuresArray.map((feature, idx) => (
-            <li key={idx}>{feature}</li>
-          )) : null;
+          <Chip size="sm" variant="outlined" color="success">
+            FREE
+          </Chip>
+          <Typography level="h2" sx={{ textAlign: 'left' }}>Free Plan</Typography>
+          <Divider inset="none" />
+          <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Mass Clean Up
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              10 Email Unsubscribes Per Month
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              5 Inbox Recaps Per Month
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Upgrade Anytime
+            </ListItem>
+          </List>
+          <Divider inset="none" />
+          <CardActions>
+            <Typography level="title-lg" sx={{ mr: 'auto' }}>
+              Free
+            </Typography>
+            <Button
+              variant="soft"
+              color="success"
+              endDecorator={<KeyboardArrowRight />}
+            >
+              Start now
+            </Button>
+          </CardActions>
+        </Card>
 
-          return (
-            <div className="pricing-plan" key={index}>
-              <h2>{plan.name}</h2>
-              <p className="price">
-                {isYearly ? (
-                  <>
-                    <span className="original-price">
-                      <s>{plan.originalPrice}</s>
-                    </span>
-                    <span className="discounted-price">
-                      {plan.discountedPrice}<span className="per-mo-small">/mo</span>
-                    </span>
-                    <span className="billed-yearly">
-                      Billed {plan.billedYearly} yearly
-                      <span className="save-button">
-                        Save <b>{plan.saveAmount}/y</b>
-                      </span>
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    {plan.price}<span className="per-mo-small">/mo</span>
-                  </>
-                )}
-              </p>
-              <ul className="plan-features">
-                {featureList}
-              </ul>
-              <button
-                className="cta-button"
-                onClick={() => handleSignup(plan.link)}
-              >
-                {plan.name === "Personal" ? "Start For Free" : "Get Started"}
-              </button>
-              {plan.name === "Personal" && (
-                <p className="trial-text">Free 7 Day Trial</p>
-              )}
-              <p className="cancel-text">Cancel anytime</p>
-            </div>
-          );
-        })}
-      </div>
-    </section>
+        {/* Basic Plan Card */}
+        <Card
+          size="lg"
+          variant="outlined"
+          sx={{ width: 350, maxWidth: '100%' }}
+        >
+          <Chip size="sm" variant="outlined" color="neutral">
+            BASIC
+          </Chip>
+          <Typography level="h2" sx={{ textAlign: 'left' }}>Monthly</Typography>
+          <Divider inset="none" />
+          <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Mass Clean Up
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Email Unsubscribes
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Inbox Recaps
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Cancel Anytime
+            </ListItem>
+          </List>
+          <Divider inset="none" />
+          <CardActions>
+            <Typography level="title-lg" sx={{ mr: 'auto' }}>
+              $8{' '}
+              <Typography textColor="text.tertiary" sx={{ fontSize: 'sm' }}>
+                / month
+              </Typography>
+            </Typography>
+            <Button
+              variant="soft"
+              color="neutral"
+              endDecorator={<KeyboardArrowRight />}
+            >
+              Start now
+            </Button>
+          </CardActions>
+        </Card>
+
+        {/* Most Popular Plan Card */}
+        <Card
+          size="lg"
+          variant="solid"
+          color="neutral"
+          invertedColors
+          sx={{ bgcolor: '#01105b', width: 350, maxWidth: '100%' }}
+        >
+          <Chip size="sm" variant="outlined">
+            MOST POPULAR
+          </Chip>
+          <Typography level="h2" sx={{ textAlign: 'left' }}>Yearly</Typography>
+          <Divider inset="none" />
+          <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Mass Clean Up
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Email Unsubscribes
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Unlimited Inbox Recaps
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <Check />
+              </ListItemDecorator>
+              Cancel Anytime
+            </ListItem>
+          </List>
+          <Divider inset="none" />
+          <CardActions>
+            <Typography level="title-lg" sx={{ mr: 'auto' }}>
+              $60{' '}
+              <Typography textColor="text.tertiary" sx={{ fontSize: 'sm' }}>
+                / year
+              </Typography>
+            </Typography>
+            <Button
+              sx={{
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: 'lightgray',
+                },
+              }}
+              endDecorator={<KeyboardArrowRight />}
+            >
+              Start now
+            </Button>
+          </CardActions>
+        </Card>
+      </Box>
+    </Box>
+    </div>
   );
-};
-
-export default Pricing;
+}
