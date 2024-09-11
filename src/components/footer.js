@@ -8,7 +8,7 @@ const Footer = () => {
   const pathname = usePathname();
 
   // Do not render Footer on specified pages
-  if (['/login', '/dashboard', '/clear-inbox', '/daily-recap', '/mass-delete'].includes(pathname)) {
+  if (['/login', '/dashboard', '/clear-inbox', '/daily-recap', '/mass-delete', '/faq'].includes(pathname)) {
     return null;
   }
 
