@@ -36,7 +36,7 @@ const Footer = () => {
           </Grid>
 
           <Grid xs={12} sm={4}>
-            <Typography level="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+            <Typography level="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold', fontSize: '1.3rem', color: 'text.primary' }}>
               Sections
             </Typography>
             <List size="sm" sx={{ '--ListItem-paddingY': '4px', '--ListItem-paddingX': '0px' }}>
@@ -50,6 +50,7 @@ const Footer = () => {
                         color: '#1e3a8a',
                         textDecoration: 'none',
                         display: 'block',
+                        fontSize: '1.1rem',
                         width: '100%',
                         '&:hover': { 
                           color: 'primary.main',
@@ -66,7 +67,7 @@ const Footer = () => {
           </Grid>
 
           <Grid xs={12} sm={4}>
-            <Typography level="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+            <Typography level="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold', fontSize: '1.3rem', color: 'text.primary' }}>
               Legal
             </Typography>
             <List size="sm" sx={{ '--ListItem-paddingY': '4px', '--ListItem-paddingX': '0px' }}>
@@ -81,6 +82,7 @@ const Footer = () => {
                         textDecoration: 'none',
                         display: 'block',
                         width: '100%',
+                        fontSize: '1.1rem',
                         '&:hover': { 
                           color: 'primary.main',
                           textDecoration: 'underline'
