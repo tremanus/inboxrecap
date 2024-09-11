@@ -1,19 +1,19 @@
 import { google } from 'googleapis';
-import { createClient } from '@supabase/supabase-js';
-import { getSession } from 'next-auth/react'; // Use this for client-side session fetching in the Edge function
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 
-// Supabase client initialization
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 async function getOAuthClientFromSession(session) {
-  if (!session || !session.accessToken) {
+  if (!session || !session.user || !session.user.accessToken) {
     console.error('No session or access token found');
     return null;
   }
 
   const oauth2Client = new google.auth.OAuth2();
   oauth2Client.setCredentials({
-    access_token: session.accessToken,
+    access_token: session.user.accessToken,
   });
 
   return oauth2Client;
@@ -23,7 +23,7 @@ async function fetchUnsubscribedEmails(userEmail) {
   const { data, error } = await supabase
     .from('email_statistics')
     .select('unsubscribed_emails')
-    .eq('user_id', userEmail)
+    .eq('user_id', userEmail) // Use userEmail as the user_id
     .single();
 
   if (error) {
@@ -34,20 +34,17 @@ async function fetchUnsubscribedEmails(userEmail) {
   return data.unsubscribed_emails || [];
 }
 
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(req) {
-  const session = await getSession({ req });
+export async function GET(request) {
+  const session = await getServerSession(authOptions);
   const oauth2Client = await getOAuthClientFromSession(session);
 
   if (!oauth2Client) {
+    console.error('OAuth client not created');
     return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 });
   }
 
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-  const url = new URL(req.url);
+  const url = new URL(request.url);
   const timeRange = url.searchParams.get('timeRange') || 'last_week';
   const startDate = getStartDateFromRange(timeRange);
 
@@ -65,6 +62,8 @@ export default async function handler(req) {
       });
 
       const fetchedMessages = response.data.messages || [];
+      console.log(`Fetched ${fetchedMessages.length} messages.`);
+      
       messages = messages.concat(fetchedMessages);
       nextPageToken = response.data.nextPageToken;
 
@@ -91,11 +90,13 @@ export default async function handler(req) {
       }
     }));
 
+    // Fetch unsubscribed emails for the current user
     const unsubscribedEmails = await fetchUnsubscribedEmails(session.user.email);
+
     const senderCounts = {};
     const senderReadCounts = {};
     const unsubscribeLinks = {};
-    const unsubscribedSenders = new Set(unsubscribedEmails);
+    const unsubscribedSenders = new Set(unsubscribedEmails); // Using a Set for efficient lookups
 
     emailDetails.filter(Boolean).forEach(({ headers, labelIds }) => {
       const sender = getHeaderValue(headers, 'From');
@@ -103,9 +104,11 @@ export default async function handler(req) {
 
       if (sender) {
         senderCounts[sender] = (senderCounts[sender] || 0) + 1;
+
         if (!labelIds.includes('UNREAD')) {
           senderReadCounts[sender] = (senderReadCounts[sender] || 0) + 1;
         }
+
         if (links.length > 0) {
           unsubscribeLinks[sender] = links;
         }
@@ -113,7 +116,7 @@ export default async function handler(req) {
     });
 
     const sortedSenders = Object.entries(senderCounts)
-      .filter(([sender]) => unsubscribeLinks[sender] && unsubscribeLinks[sender].length > 0)
+      .filter(([sender]) => unsubscribeLinks[sender] && unsubscribeLinks[sender].length > 0) // Only include senders with unsubscribe links
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([sender, count]) => ({
@@ -121,7 +124,7 @@ export default async function handler(req) {
         read: senderReadCounts[sender] || 0,
         count: count,
         unsubscribeLinks: unsubscribeLinks[sender] || [],
-        unsubscribed: unsubscribedSenders.has(sender),
+        unsubscribed: unsubscribedSenders.has(sender), // Determine if sender is unsubscribed
       }));
 
     return new Response(JSON.stringify(sortedSenders), { status: 200 });
