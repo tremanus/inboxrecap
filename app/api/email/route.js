@@ -3,11 +3,15 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import * as cheerio from 'cheerio'; // Import Cheerio
 import OpenAI from 'openai';  // Import OpenAI client
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 
 // Initialize OpenAI client with API key
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Initialize Supabase client
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -17,6 +21,7 @@ export async function GET(request) {
   }
 
   const accessToken = session.user.accessToken;
+  const userEmail = session.user.email; // Get the user's email from the session
 
   const oauth2Client = new google.auth.OAuth2();
   oauth2Client.setCredentials({ access_token: accessToken });
@@ -24,6 +29,7 @@ export async function GET(request) {
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
   try {
+    // Step 1: Fetch unread emails
     const response = await gmail.users.messages.list({
       userId: 'me',
       q: 'is:unread newer_than:1d',
@@ -35,40 +41,53 @@ export async function GET(request) {
       return new Response(JSON.stringify({ message: 'No unread emails found' }), { status: 404 });
     }
 
+    // Step 2: Process each email
     const emailPromises = messages.map(async (message) => {
-        try {
-          const msg = await gmail.users.messages.get({
-            userId: 'me',
-            id: message.id,
-            format: 'full',
-          });
-      
-          const headers = msg.data.payload.headers;
-          const body = getVisibleText(msg.data.payload);
-          const contentToSummarize = body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`;
+      try {
+        const msg = await gmail.users.messages.get({
+          userId: 'me',
+          id: message.id,
+          format: 'full',
+        });
 
-          const summary = await getSummaryFromGPT(contentToSummarize);  // Summarize email content using GPT
+        const headers = msg.data.payload.headers;
+        const body = getVisibleText(msg.data.payload);
+        const contentToSummarize = body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`;
 
-          return {
-            id: message.id,
-            body: body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`,  // Fallback to subject and snippet
-            unsubscribeLinks: getUnsubscribeLinks(headers),  // Extract unsubscribe links
-            sender: getHeaderValue(headers, 'From'),  // Extract sender
-            subject: getHeaderValue(headers, 'Subject'),  // Extract subject
-            summary,  // Include GPT-4o-mini summary
-          };
-        } catch (error) {
-          console.error('Error fetching message content:', error);
-          return {
-            id: message.id,
-            body: `No Subject: ${message.snippet}`,  // Fallback to subject and snippet
-            sender: 'Unknown',
-            subject: 'No Subject',
-            unsubscribeLinks: [],
-            summary: 'Unable to summarize email content',
-          };
-        }
-      });      
+        const summary = await getSummaryFromGPT(contentToSummarize);  // Summarize email content using GPT
+
+        // Mark email as read
+        await gmail.users.messages.modify({
+          userId: 'me',
+          id: message.id,
+          resource: {
+            removeLabelIds: ['UNREAD'],
+          },
+        });
+
+        // Update Supabase statistics
+        await updateEmailStatistics(userEmail);
+
+        return {
+          id: message.id,
+          body: body || `${getHeaderValue(headers, 'Subject')}: ${msg.data.snippet}`,  // Fallback to subject and snippet
+          unsubscribeLinks: getUnsubscribeLinks(headers),  // Extract unsubscribe links
+          sender: getHeaderValue(headers, 'From'),  // Extract sender
+          subject: getHeaderValue(headers, 'Subject'),  // Extract subject
+          summary,  // Include GPT-4o-mini summary
+        };
+      } catch (error) {
+        console.error('Error fetching message content:', error);
+        return {
+          id: message.id,
+          body: `No Subject: ${message.snippet}`,  // Fallback to subject and snippet
+          sender: 'Unknown',
+          subject: 'No Subject',
+          unsubscribeLinks: [],
+          summary: 'Unable to summarize email content',
+        };
+      }
+    });
 
     const emailData = await Promise.all(emailPromises);
 
@@ -160,5 +179,38 @@ async function getSummaryFromGPT(content) {
   } catch (error) {
     console.error('Error fetching GPT summary:', error);
     return 'Unable to summarize email content';
+  }
+}
+
+// Function to update email statistics in Supabase
+async function updateEmailStatistics(userEmail) {
+  try {
+    const { data, error } = await supabase
+      .from('email_statistics')
+      .select('emails_marked_as_read, emails_summarized')
+      .eq('user_id', userEmail)
+      .single();
+
+    if (error) {
+      console.error('Error fetching statistics:', error);
+      return;
+    }
+
+    const updatedEmailsMarkedAsRead = (data?.emails_marked_as_read || 0) + 1;
+    const updatedEmailsSummarized = (data?.emails_summarized || 0) + 1;
+
+    const { error: updateError } = await supabase
+      .from('email_statistics')
+      .update({
+        emails_marked_as_read: updatedEmailsMarkedAsRead,
+        emails_summarized: updatedEmailsSummarized,
+      })
+      .eq('user_id', userEmail);
+
+    if (updateError) {
+      console.error('Error updating statistics:', updateError);
+    }
+  } catch (error) {
+    console.error('Error updating email statistics:', error);
   }
 }
