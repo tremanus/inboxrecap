@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Button from '@mui/joy/Button';
 import Typography from '@mui/joy/Typography';
 import ArrowForward from '@mui/icons-material/ArrowForward';
@@ -92,9 +93,11 @@ export default function Features2() {
       >
         Mark your emails from the last day as read, summarize each in one sentence, and receive them in an email all in <b>one</b> click.
       </Typography>
-      <Button size="lg" sx={{ mb: '60px' }}  endDecorator={<ArrowForward fontSize="xl" />}>
+      <Link href="/login" passHref>
+      <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />}>
         Start For Free
       </Button>
+    </Link>
     </TwoSidedLayout>
   );
 }

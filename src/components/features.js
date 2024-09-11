@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Button from '@mui/joy/Button';
 import Typography from '@mui/joy/Typography';
 import ArrowForward from '@mui/icons-material/ArrowForward';
@@ -130,11 +131,13 @@ export default function Features() {
         textColor="text.secondary"
         sx={{ fontSize: 'lg', lineHeight: 'lg', mb: '10px' }}
       >
-        View your top senders and find out how often you read their emails. Unsubscribe from mailing lists you deem unnecessary, mark their emails as read, and delete them all in one place.
+        View your top senders and find out how often you read their emails. Unsubscribe from mailing lists you deem unnecessary, mark their emails as read, and delete them.
       </Typography>
+      <Link href="/login" passHref>
       <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />}>
         Start For Free
       </Button>
+    </Link>
     </TwoSidedLayout>
   );
 }
