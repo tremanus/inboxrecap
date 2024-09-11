@@ -16,9 +16,10 @@ export default function TopDashNav() {
   };
 
   const handleSignOut = () => {
-    signOut();
+    signOut({ callbackUrl: '/' }); // Redirect to homepage after signing out
     setIsDropdownOpen(false);
   };
+  
 
   // Track window resize and check if it's desktop size
   useEffect(() => {

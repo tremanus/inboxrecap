@@ -19,7 +19,7 @@ export default function TopDashNav() {
   };
 
   const handleSignOut = () => {
-    signOut();
+    signOut({ callbackUrl: '/' });
     setIsDropdownOpen(false);
   };
 
