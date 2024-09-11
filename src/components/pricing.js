@@ -12,18 +12,43 @@ import Typography from '@mui/joy/Typography';
 import Check from '@mui/icons-material/Check';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Load your Stripe publishable key from environment variables
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
+const handleCheckout = async (priceId) => {
+  // Call your backend to create a Checkout Session
+  const res = await fetch('/api/checkout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ priceId }),
+  });
+  const { id } = await res.json();
+
+  // Get Stripe.js instance
+  const stripe = await stripePromise;
+
+  // Redirect to Checkout
+  const { error } = await stripe.redirectToCheckout({ sessionId: id });
+  if (error) {
+    console.error('Stripe Checkout Error:', error);
+  }
+};
 
 export default function Pricing() {
   return (
     <div id='pricing'>
-    <Box
-      sx={{
-        textAlign: 'center',
-        mb: 20,
-        mt: -10,
-      }}
-    >
       <Box
+        sx={{
+          textAlign: 'center',
+          mb: 20,
+          mt: -10,
+        }}
+      >
+        <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
@@ -48,190 +73,192 @@ export default function Pricing() {
             <Typography sx={{ color: 'black' }}>Pricing</Typography>
           </Button>
         </Box>
-      <Typography level="h1" sx={{ mb: 4, fontSize: '4rem' }}>
-        Organize Your Inbox
-      </Typography>
-      <Typography level="body1" sx={{ mb: 8, fontSize: '1.2rem' }}>
-        Select the plan that best suits your needs. Upgrade or cancel anytime.
-      </Typography>
-      
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: 2,
-          flexWrap: 'wrap',
-        }}
-      >
-        {/* Free Plan Card */}
-        <Card
-          size="lg"
-          variant="outlined"
-          sx={{ width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' } }}
+        <Typography level="h1" sx={{ mb: 4, fontSize: '4rem' }}>
+          Organize Your Inbox
+        </Typography>
+        <Typography level="body1" sx={{ mb: 8, fontSize: '1.2rem' }}>
+          Select the plan that best suits your needs. Upgrade or cancel anytime.
+        </Typography>
+        
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+          }}
         >
-          <Chip size="sm" variant="outlined" color="success">
-            FREE
-          </Chip>
-          <Typography level="h2" sx={{ textAlign: 'left' }}>Free Plan</Typography>
-          <Divider inset="none" />
-          <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Mass Clean Up
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              10 Email Unsubscribes Per Month
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              5 Inbox Recaps Per Month
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Upgrade Anytime
-            </ListItem>
-          </List>
-          <Divider inset="none" />
-          <CardActions>
-            <Typography level="title-lg" sx={{ mr: 'auto' }}>
-              Free
-            </Typography>
-            <Button
-              variant="soft"
-              color="success"
-              endDecorator={<KeyboardArrowRight />}
-            >
-              Start now
-            </Button>
-          </CardActions>
-        </Card>
-
-        {/* Basic Plan Card */}
-        <Card
-          size="lg"
-          variant="outlined"
-          sx={{ width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' } }}
-        >
-          <Chip size="sm" variant="outlined" color="neutral">
-            BASIC
-          </Chip>
-          <Typography level="h2" sx={{ textAlign: 'left' }}>Monthly</Typography>
-          <Divider inset="none" />
-          <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Mass Clean Up
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Email Unsubscribes
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Inbox Recaps
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Cancel Anytime
-            </ListItem>
-          </List>
-          <Divider inset="none" />
-          <CardActions>
-            <Typography level="title-lg" sx={{ mr: 'auto' }}>
-              $8{' '}
-              <Typography textColor="text.tertiary" sx={{ fontSize: 'sm' }}>
-                / month
+          {/* Free Plan Card */}
+          <Card
+            size="lg"
+            variant="outlined"
+            sx={{ width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' } }}
+          >
+            <Chip size="sm" variant="outlined" color="success">
+              FREE
+            </Chip>
+            <Typography level="h2" sx={{ textAlign: 'left' }}>Free Plan</Typography>
+            <Divider inset="none" />
+            <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Mass Clean Up
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                10 Email Unsubscribes Per Month
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                5 Inbox Recaps Per Month
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Upgrade Anytime
+              </ListItem>
+            </List>
+            <Divider inset="none" />
+            <CardActions>
+              <Typography level="title-lg" sx={{ mr: 'auto' }}>
+                Free
               </Typography>
-            </Typography>
-            <Button
-              variant="soft"
-              color="neutral"
-              endDecorator={<KeyboardArrowRight />}
-            >
-              Start now
-            </Button>
-          </CardActions>
-        </Card>
+              <Button
+                variant="soft"
+                color="success"
+                endDecorator={<KeyboardArrowRight />}
+              >
+                Start now
+              </Button>
+            </CardActions>
+          </Card>
 
-        {/* Most Popular Plan Card */}
-        <Card
-          size="lg"
-          variant="solid"
-          color="neutral"
-          invertedColors
-          sx={{ bgcolor: '#01105b', width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' }}}
-        >
-          <Chip size="sm" variant="outlined">
-            MOST POPULAR
-          </Chip>
-          <Typography level="h2" sx={{ textAlign: 'left' }}>Yearly</Typography>
-          <Divider inset="none" />
-          <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Mass Clean Up
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Email Unsubscribes
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Unlimited Inbox Recaps
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Check />
-              </ListItemDecorator>
-              Cancel Anytime
-            </ListItem>
-          </List>
-          <Divider inset="none" />
-          <CardActions>
-            <Typography level="title-lg" sx={{ mr: 'auto' }}>
-              $60{' '}
-              <Typography textColor="text.tertiary" sx={{ fontSize: 'sm' }}>
-                / year
+          {/* Basic Plan Card */}
+          <Card
+            size="lg"
+            variant="outlined"
+            sx={{ width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' } }}
+          >
+            <Chip size="sm" variant="outlined" color="neutral">
+              BASIC
+            </Chip>
+            <Typography level="h2" sx={{ textAlign: 'left' }}>Monthly</Typography>
+            <Divider inset="none" />
+            <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Mass Clean Up
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Email Unsubscribes
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Inbox Recaps
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Cancel Anytime
+              </ListItem>
+            </List>
+            <Divider inset="none" />
+            <CardActions>
+              <Typography level="title-lg" sx={{ mr: 'auto' }}>
+                $8{' '}
+                <Typography textColor="text.tertiary" sx={{ fontSize: 'sm' }}>
+                  / month
+                </Typography>
               </Typography>
-            </Typography>
-            <Button
-              sx={{
-                color: 'black',
-                '&:hover': {
-                  backgroundColor: 'lightgray',
-                },
-              }}
-              endDecorator={<KeyboardArrowRight />}
-            >
-              Start now
-            </Button>
-          </CardActions>
-        </Card>
+              <Button
+                variant="soft"
+                color="neutral"
+                onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID)}
+                endDecorator={<KeyboardArrowRight />}
+              >
+                Start now
+              </Button>
+            </CardActions>
+          </Card>
+
+          {/* Most Popular Plan Card */}
+          <Card
+            size="lg"
+            variant="solid"
+            color="neutral"
+            invertedColors
+            sx={{ bgcolor: '#01105b', width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' }}}
+          >
+            <Chip size="sm" variant="outlined">
+              MOST POPULAR
+            </Chip>
+            <Typography level="h2" sx={{ textAlign: 'left' }}>Yearly</Typography>
+            <Divider inset="none" />
+            <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Mass Clean Up
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Email Unsubscribes
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Unlimited Inbox Recaps
+              </ListItem>
+              <ListItem>
+                <ListItemDecorator>
+                  <Check />
+                </ListItemDecorator>
+                Cancel Anytime
+              </ListItem>
+            </List>
+            <Divider inset="none" />
+            <CardActions>
+              <Typography level="title-lg" sx={{ mr: 'auto' }}>
+                $60{' '}
+                <Typography textColor="text.tertiary" sx={{ fontSize: 'sm' }}>
+                  / year
+                </Typography>
+              </Typography>
+              <Button
+                sx={{
+                  color: 'black',
+                  '&:hover': {
+                    backgroundColor: 'lightgray',
+                  },
+                }}
+                onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID)}
+                endDecorator={<KeyboardArrowRight />}
+              >
+                Start now
+              </Button>
+            </CardActions>
+          </Card>
+        </Box>
       </Box>
-    </Box>
     </div>
   );
 }
