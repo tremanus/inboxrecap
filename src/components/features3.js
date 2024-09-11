@@ -9,38 +9,10 @@ import MarkAsUnreadOutlinedIcon from '@mui/icons-material/MarkAsUnreadOutlined';
 import { typographyClasses } from '@mui/joy/Typography';
 
 // Combined Features Component
-export default function Features() {
+export default function Features3() {
   function TwoSidedLayout({ children, reversed }) {
     return (
       <>
-        <div id='features'>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              mt: 20,
-              mb: 5,
-            }}
-          >
-            <Button
-              sx={{
-                backgroundColor: '#6ebef7',
-                color: 'black',
-                borderRadius: '25px',
-                padding: '8px 16px',
-                fontSize: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                textTransform: 'none',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-              }}
-              startDecorator={<MarkAsUnreadOutlinedIcon sx={{ color: 'black', mr: 0.5 }} />}
-              disabled
-            >
-              <Typography sx={{ color: 'black' }}>Core Features</Typography>
-            </Button>
-          </Box>
-        </div>
         <Container
           sx={[
             theme => ({
@@ -49,12 +21,10 @@ export default function Features() {
               display: 'flex',
               alignItems: 'flex-start', // Align text above image
               gap: 8,
-              mt: 8, // Move everything down slightly for spacing
               flexDirection: 'column', // Initially stack text above image
               [theme.breakpoints.up(900)]: { // On larger screens, switch layout
                 flexDirection: 'row',
                 alignItems: 'flex-start',
-                mt: 15,
               },
               [theme.breakpoints.down(900)]: {
                 alignItems: 'center',
@@ -102,7 +72,7 @@ export default function Features() {
             })}
           >
             <img
-              src="/clearinbox.png"
+              src="/massdelete.png"
               alt="Clear Your Inbox"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Ensures the image fits the container
             />
@@ -115,7 +85,7 @@ export default function Features() {
   return (
     <TwoSidedLayout>
       <Typography color="primary" sx={{ fontSize: 'lg', fontWeight: 'lg' }}>
-        Clear Your Inbox
+        Mass Delete Emails
       </Typography>
       <Typography
         level="h1"

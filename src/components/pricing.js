@@ -19,8 +19,8 @@ export default function Pricing() {
     <Box
       sx={{
         textAlign: 'center',
-        mt: 15,
         mb: 20,
+        mt: -10,
       }}
     >
       <Box
@@ -67,7 +67,7 @@ export default function Pricing() {
         <Card
           size="lg"
           variant="outlined"
-          sx={{ width: 350, maxWidth: '100%' }}
+          sx={{ width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' } }}
         >
           <Chip size="sm" variant="outlined" color="success">
             FREE
@@ -119,7 +119,7 @@ export default function Pricing() {
         <Card
           size="lg"
           variant="outlined"
-          sx={{ width: 350, maxWidth: '100%' }}
+          sx={{ width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' } }}
         >
           <Chip size="sm" variant="outlined" color="neutral">
             BASIC
@@ -176,7 +176,7 @@ export default function Pricing() {
           variant="solid"
           color="neutral"
           invertedColors
-          sx={{ bgcolor: '#01105b', width: 350, maxWidth: '100%' }}
+          sx={{ bgcolor: '#01105b', width: 350, maxWidth: '100%', '&:hover': { transform: 'scale(1.05)' }}}
         >
           <Chip size="sm" variant="outlined">
             MOST POPULAR

@@ -1,50 +1,111 @@
-"use client";
+'use client';
 import React from 'react';
-import { usePathname } from 'next/navigation'; // Import the usePathname hook
-import './footer.css'; // Import your CSS for styling
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { Box, Typography, Grid, List, ListItem, Container } from '@mui/joy';
 
 const Footer = () => {
-  const pathname = usePathname(); // Get the current pathname
+  const pathname = usePathname();
 
-  // Do not render Footer if on the /login, /dashboard, or /clear-inbox pages
-  if (pathname === '/login' || pathname === '/dashboard' || pathname === '/clear-inbox' || pathname === '/daily-recap' || pathname === '/mass-delete') {
+  // Do not render Footer on specified pages
+  if (['/login', '/dashboard', '/clear-inbox', '/daily-recap', '/mass-delete'].includes(pathname)) {
     return null;
   }
 
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-section">
-          <h3>Contact Us</h3>
-          <p>Email: <a href="mailto:support@inboxrecap.com">support@inboxrecap.com</a></p>
-          <p>Phone: (617) 454-4971</p>
-        </div>
+    <Box component="footer" sx={{ bgcolor: '#f4f3f3', color: 'text.primary', py: 8 }}>
+      <Container maxWidth="lg">
+        <Grid 
+          container 
+          spacing={10} 
+          justifyContent="space-between" 
+          sx={{ 
+            flexDirection: { xs: 'column', sm: 'row' } // Stack vertically on small screens
+          }}
+        >
+          <Grid xs={12} sm={4}>
+            <Typography level="h4" component="h2" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+              InboxRecap
+            </Typography>
+            <Typography level="body2" sx={{ color: 'text.secondary', mb: '10px' }}>
+              Simplify your inbox, amplify your productivity.
+            </Typography>
+            <Typography level="body2" sx={{ color: 'text.secondary' }}>
+              <Link href="mailto:support@inboxrecap.com" style={{ color: '#1e3a8a', textDecoration: 'none' }}>support@inboxrecap.com</Link>
+            </Typography>
+          </Grid>
 
-        <div className="footer-section">
-          <h3>Quick Links</h3>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/pricing">Pricing</a></li>
-            <li><a href="/faq">FAQ</a></li>
-            <li><a href="/contact">Contact</a></li>
-          </ul>
-        </div>
+          <Grid xs={12} sm={4}>
+            <Typography level="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+              Sections
+            </Typography>
+            <List size="sm" sx={{ '--ListItem-paddingY': '4px', '--ListItem-paddingX': '0px' }}>
+              {['Features', 'Pricing', 'FAQ'].map((item) => (
+                <ListItem key={item}>
+                  <Link href={`#${item.toLowerCase()}`} passHref style={{ width: '100%' }}>
+                    <Typography
+                      level="body2"
+                      component="a"
+                      sx={{ 
+                        color: '#1e3a8a',
+                        textDecoration: 'none',
+                        display: 'block',
+                        width: '100%',
+                        '&:hover': { 
+                          color: 'primary.main',
+                          textDecoration: 'underline'
+                        }
+                      }}
+                    >
+                      {item}
+                    </Typography>
+                  </Link>
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
 
-        <div className="footer-section">
-          <h3>Follow Us</h3>
-          <a href="https://instagram.com/inboxrecap" target="_blank" rel="noopener noreferrer" className="social-icon">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" />
-          </a>
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon">TW</a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon">LI</a>
-          <p className="personal">Made by <a href="https://tremanus.github.io" target="_blank" rel="noopener noreferrer">Biya</a></p>
-        </div>
-      </div>
+          <Grid xs={12} sm={4}>
+            <Typography level="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+              Legal
+            </Typography>
+            <List size="sm" sx={{ '--ListItem-paddingY': '4px', '--ListItem-paddingX': '0px' }}>
+              {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
+                <ListItem key={item}>
+                  <Link href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} passHref style={{ width: '100%' }}>
+                    <Typography
+                      level="body2"
+                      component="a"
+                      sx={{ 
+                        color: '#1e3a8a',
+                        textDecoration: 'none',
+                        display: 'block',
+                        width: '100%',
+                        '&:hover': { 
+                          color: 'primary.main',
+                          textDecoration: 'underline'
+                        }
+                      }}
+                    >
+                      {item}
+                    </Typography>
+                  </Link>
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+        </Grid>
 
-      <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} InboxRecap. All rights reserved.</p>
-      </div>
-    </footer>
+        <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Typography level="body2" textAlign="center" sx={{ color: 'text.secondary' }}>
+            © {new Date().getFullYear()} InboxRecap. All rights reserved.
+          </Typography>
+          <Typography level="body2" textAlign="center" sx={{ mt: 1, color: 'text.secondary' }}>
+            Made with ❤️ by <Link href="https://tremanus.github.io" target="_blank" rel="noopener noreferrer" style={{ color: '#1e3a8a', fontWeight: 'bold', textDecoration: 'none' }}>Biya</Link>
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

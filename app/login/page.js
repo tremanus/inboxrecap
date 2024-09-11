@@ -10,7 +10,7 @@ const Login = () => {
 
   const handleSignIn = async () => {
     // Trigger the NextAuth sign-in function with the 'google' provider
-    await signIn('google', { callbackUrl: '/' }); // Redirect to home page after login
+    await signIn('google', { callbackUrl: '/dashboard' }); // Redirect to home page after login
   };
 
   return (

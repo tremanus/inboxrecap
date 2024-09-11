@@ -11,6 +11,10 @@
   box-sizing: border-box;
 }
 
+.faq-left a {
+  color: rgb(0, 0, 157);
+}
+
 .container {
   padding: 20px 80px;
   display: flex;

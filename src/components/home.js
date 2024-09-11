@@ -6,6 +6,8 @@ import EmailCounter from './emailcounter';
 import FAQ from './faq';
 import Pricing from './pricing';
 import Features from './features';
+import Features2 from './features2';
+import Features3 from './features3';
 import './home.css'; // Ensure the CSS file is correctly imported
 
 const Home = () => {
@@ -37,6 +39,8 @@ const Home = () => {
         </div>
       </div>
       <Features />
+      <Features2 />
+      <Features3 />
       <Pricing />
       <FAQ  />
     </section>

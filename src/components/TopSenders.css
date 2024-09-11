@@ -17,19 +17,10 @@ body {
     padding: 30px;
     padding-bottom: 0px;
     justify-content: space-between; /* Push h2 to the left and select to the right */
-    width: 80%;
 }
 
 .time-range-selector h2 {
     text-align: left;
-}
-
-.time-range-selector select {
-    border: none;
-    font-size: 0.8rem;
-    padding: 5px;
-    box-sizing: border-box;
-    outline: none;
 }
   
   .error-message {

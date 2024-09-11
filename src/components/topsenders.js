@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { Select, Option } from '@mui/joy'; // Import Joy UI Select and Option
 import './TopSenders.css';
 
 const TopSenders = () => {
@@ -30,11 +32,9 @@ const TopSenders = () => {
   }, [timeRange]);
 
   const handleUnsubscribe = async (link, senderEmail) => {
-    // Open the unsubscribe link in a new tab
     window.open(link, '_blank');
 
     try {
-      // Send a POST request to the backend to update Supabase
       const response = await fetch('/api/unsubscribe', {
         method: 'POST',
         headers: {
@@ -49,7 +49,6 @@ const TopSenders = () => {
 
       const data = await response.json();
       console.log('Unsubscribed successfully:', data);
-      // Optionally, refresh the list after unsubscribing
       fetchTopSenders();
     } catch (err) {
       console.error('Failed to unsubscribe:', err.message);
@@ -63,22 +62,21 @@ const TopSenders = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sender: senderEmail, timeRange: timeRange }), // Ensure sender and timeRange are sent
+        body: JSON.stringify({ sender: senderEmail, timeRange: timeRange }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to mark emails as read');
       }
-  
+
       const data = await response.json();
       console.log('Marked as read successfully:', data);
-      // Optionally, refresh the list after marking as read
       fetchTopSenders();
     } catch (err) {
       console.error('Failed to mark as read:', err.message);
     }
   };
-  
+
   const handleDeleteAll = async (senderEmail) => {
     try {
       const response = await fetch('/api/movetotrash', {
@@ -86,24 +84,23 @@ const TopSenders = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ deleteAll: true, timeRange: timeRange, sender: senderEmail }), // Remove sender if not needed
+        body: JSON.stringify({ deleteAll: true, timeRange: timeRange, sender: senderEmail }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to delete all emails');
       }
-  
+
       const data = await response.json();
       console.log('Deleted all emails successfully:', data);
       fetchTopSenders();
     } catch (err) {
       console.error('Failed to delete all emails:', err.message);
     }
-  };  
+  };
 
-  const handleTimeRangeChange = (event) => {
-    const newTimeRange = event.target.value;
-    setTimeRange(newTimeRange);
+  const handleTimeRangeChange = (event, newValue) => {
+    setTimeRange(newValue);
   };
 
   const getProgressColor = (progress) => {
@@ -116,12 +113,23 @@ const TopSenders = () => {
     <div className="top-senders-container">
       <div className="time-range-selector">
         <h2>Top Senders</h2>
-        <select id="timeRange" value={timeRange} onChange={handleTimeRangeChange}>
-          <option value="last_week">Last Week</option>
-          <option value="last_month">Last Month</option>
-          <option value="last_3_months">Last 3 Months</option>
-          <option value="last_6_months">Last 6 Months</option>
-        </select>
+        <div className="custom-select">
+          <label htmlFor="timeRange">
+            <Select
+              id="timeRange"
+              value={timeRange}
+              onChange={handleTimeRangeChange}
+              placeholder="Select time range"
+              sx={{ fontSize: '0.9rem' }}
+              startDecorator={<CalendarMonthIcon sx={{ color: 'black', mr: 0.1 }} />}
+            >
+              <Option value="last_week" sx={{fontSize: '0.9rem' }}>Last Week</Option>
+              <Option value="last_month" sx={{fontSize: '0.9rem' }}>Last Month</Option>
+              <Option value="last_3_months" sx={{fontSize: '0.9rem' }}>Last 3 Months</Option>
+              <Option value="last_6_months" sx={{fontSize: '0.9rem' }}>Last 6 Months</Option>
+            </Select>
+          </label>
+        </div>
       </div>
 
       {error && <div className="error-message">Error: {error}</div>}
@@ -167,28 +175,28 @@ const TopSenders = () => {
                     <td className="total-emails-cell">{sender.count}</td>
                     <td className="actions-cell">
                       <div class="button-container">
-                      {sender.unsubscribeLinks && sender.unsubscribeLinks.length > 0 && !sender.unsubscribed ? (
+                        {sender.unsubscribeLinks && sender.unsubscribeLinks.length > 0 && !sender.unsubscribed ? (
+                          <button
+                            className="unsubscribe-button"
+                            onClick={() => handleUnsubscribe(sender.unsubscribeLinks[0], sender.sender)}
+                          >
+                            Unsubscribe
+                          </button>
+                        ) : (
+                          <span className="unsubscribed-text">Unsubscribed</span>
+                        )}
                         <button
-                          className="unsubscribe-button"
-                          onClick={() => handleUnsubscribe(sender.unsubscribeLinks[0], sender.sender)}
+                          className="mark-as-read-button"
+                          onClick={() => handleMarkAsRead(sender.sender)}
                         >
-                          Unsubscribe
+                          Mark as Read
                         </button>
-                      ) : (
-                        <span className="unsubscribed-text">Unsubscribed</span>
-                      )}
-                      <button
-                        className="mark-as-read-button"
-                        onClick={() => handleMarkAsRead(sender.sender)}
-                      >
-                        Mark as Read
-                      </button>
-                      <button
-                        className="mark-as-read-button" // Reuse the same className for styling
-                        onClick={() => handleDeleteAll(sender.sender)}
-                      >
-                        Delete
-                      </button>
+                        <button
+                          className="mark-as-read-button" // Reuse the same className for styling
+                          onClick={() => handleDeleteAll(sender.sender)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
