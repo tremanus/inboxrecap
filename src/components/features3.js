@@ -94,7 +94,7 @@ export default function Features3() {
           fontSize: 'clamp(1.875rem, 1.3636rem + 2.1818vw, 3rem)',
         }}
       >
-        Unsubscribe from bothersome mailing lists
+        Bulk delete emails and mark them as read
       </Typography>
       <Typography
         textColor="text.secondary"

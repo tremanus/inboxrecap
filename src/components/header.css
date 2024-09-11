@@ -80,6 +80,7 @@ nav ul li a:hover {
 
 .login-button:hover {
   transform: scale(1.1);
+  background: rgb(244, 244, 244);
 }
 
 .signup-button {
@@ -99,6 +100,7 @@ nav ul li a:hover {
 
 .signup-button:hover {
   transform: scale(1.05);
+  background: #6ebef7;
 }
 
 html {
