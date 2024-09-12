@@ -150,6 +150,7 @@ const styles = {
     marginTop: '20px',
     fontWeight: 'bold',
     color: '#d32f2f',
+    textAlign: 'center',
   },
   loading: {
     textAlign: 'center',
