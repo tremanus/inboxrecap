@@ -57,7 +57,7 @@ export async function POST(request) {
       console.log('Query:', query);
   
       let pageToken = null;
-      const batchSize = 2000;
+      const batchSize = 500;
       let totalEmailsMarkedAsRead = 0;
   
       do {

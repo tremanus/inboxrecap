@@ -31,7 +31,9 @@ const Footer = () => {
               Simplify your inbox, amplify your productivity.
             </Typography>
             <Typography level="body2" sx={{ color: 'text.secondary' }}>
-              <Link href="mailto:support@inboxrecap.com" style={{ color: '#1e3a8a', textDecoration: 'none' }}>support@inboxrecap.com</Link>
+              <Link href="mailto:support@inboxrecap.com" style={{ color: '#1e3a8a', textDecoration: 'none' }}>
+                support@inboxrecap.com
+              </Link>
             </Typography>
           </Grid>
 
@@ -45,7 +47,6 @@ const Footer = () => {
                   <Link href={`#${item.toLowerCase()}`} passHref style={{ width: '100%' }}>
                     <Typography
                       level="body2"
-                      component="a"
                       sx={{ 
                         color: '#1e3a8a',
                         textDecoration: 'none',
@@ -76,7 +77,6 @@ const Footer = () => {
                   <Link href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} passHref style={{ width: '100%' }}>
                     <Typography
                       level="body2"
-                      component="a"
                       sx={{ 
                         color: '#1e3a8a',
                         textDecoration: 'none',

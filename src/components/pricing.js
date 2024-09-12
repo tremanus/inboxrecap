@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
 import Card from '@mui/joy/Card';
@@ -12,33 +14,26 @@ import Typography from '@mui/joy/Typography';
 import Check from '@mui/icons-material/Check';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Load your Stripe publishable key from environment variables
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-
-const handleCheckout = async (priceId) => {
-  // Call your backend to create a Checkout Session
-  const res = await fetch('/api/checkout', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ priceId }),
-  });
-  const { id } = await res.json();
-
-  // Get Stripe.js instance
-  const stripe = await stripePromise;
-
-  // Redirect to Checkout
-  const { error } = await stripe.redirectToCheckout({ sessionId: id });
-  if (error) {
-    console.error('Stripe Checkout Error:', error);
-  }
-};
 
 export default function Pricing() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleStartNow = (plan) => {
+    if (!session) {
+      signIn('google', { callbackUrl: `/api/redirect-to-payment?plan=${plan}` });
+    } else {
+      if (plan === 'free') {
+        router.push('/dashboard');
+      } else {
+        const paymentLink = plan === 'monthly' 
+          ? 'https://buy.stripe.com/test_8wM00v1IMgdp4SIdR1'
+          : 'https://buy.stripe.com/test_3cs00v3QU7GTfxmeV4';
+        window.location.href = `${paymentLink}?prefilled_email=${encodeURIComponent(session.user.email)}`;
+      }
+    }
+  };
+
   return (
     <div id='pricing'>
       <Box
@@ -52,7 +47,7 @@ export default function Pricing() {
           sx={{
             display: 'flex',
             justifyContent: 'center',
-            mb: 3, // Margin bottom to separate from the cards
+            mb: 3,
           }}
         >
           <Button
@@ -67,8 +62,8 @@ export default function Pricing() {
               textTransform: 'none',
               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             }}
-            startDecorator={<PaymentsOutlinedIcon sx={{ color: 'black', mr: 0.5 }} />} // Set icon color to black
-            disabled // Make the button unclickable
+            startDecorator={<PaymentsOutlinedIcon sx={{ color: 'black', mr: 0.5 }} />}
+            disabled
           >
             <Typography sx={{ color: 'black' }}>Pricing</Typography>
           </Button>
@@ -134,6 +129,7 @@ export default function Pricing() {
                 variant="soft"
                 color="success"
                 endDecorator={<KeyboardArrowRight />}
+                onClick={() => handleStartNow('free')}
               >
                 Start now
               </Button>
@@ -188,8 +184,8 @@ export default function Pricing() {
               <Button
                 variant="soft"
                 color="neutral"
-                onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID)}
                 endDecorator={<KeyboardArrowRight />}
+                onClick={() => handleStartNow('monthly')}
               >
                 Start now
               </Button>
@@ -250,8 +246,8 @@ export default function Pricing() {
                     backgroundColor: 'lightgray',
                   },
                 }}
-                onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID)}
                 endDecorator={<KeyboardArrowRight />}
+                onClick={() => handleStartNow('yearly')}
               >
                 Start now
               </Button>
