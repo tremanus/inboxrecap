@@ -2,6 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import AOS from 'aos'; // Import AOS library
+import 'aos/dist/aos.css'; // Import AOS styles
 import EmailCounter from './emailcounter';
 import FAQ from './faq';
 import Pricing from './pricing';
@@ -15,6 +17,7 @@ const Home = () => {
 
   useEffect(() => {
     document.title = "InboxRecap | Clear & Summarize Your Inbox";
+    AOS.init({ duration: 1000, once: true }); // Initialize AOS with custom settings
   }, []);
 
   const handlePricingClick = () => {
@@ -42,7 +45,7 @@ const Home = () => {
       <Features2 />
       <Features3 />
       <Pricing />
-      <FAQ  />
+      <FAQ />
     </section>
   );
 };

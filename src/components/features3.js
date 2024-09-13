@@ -84,10 +84,11 @@ export default function Features3() {
 
   return (
     <TwoSidedLayout>
-      <Typography color="primary" sx={{ fontSize: 'lg', fontWeight: 'lg' }}>
+      <Typography color="primary" data-aos="fade-up" sx={{ fontSize: 'lg', fontWeight: 'lg' }}>
         Mass Delete Emails
       </Typography>
       <Typography
+      data-aos="fade-up"
         level="h1"
         sx={{
           fontWeight: 'xl',
@@ -97,13 +98,14 @@ export default function Features3() {
         Bulk delete emails and mark them as read
       </Typography>
       <Typography
+      data-aos="fade-up"
         textColor="text.secondary"
         sx={{ fontSize: 'lg', lineHeight: 'lg', mb: '10px' }}
       >
         Clean up thousands of emails at a time by either mass deleting them or mass marking them as read. Filter by category and time range.
       </Typography>
       <Link href="/login" passHref>
-      <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />}>
+      <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />} data-aos="fade-up">
         Start For Free
       </Button>
     </Link>

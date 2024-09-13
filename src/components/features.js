@@ -9,13 +9,13 @@ import Container from '@mui/joy/Container';
 import MarkAsUnreadOutlinedIcon from '@mui/icons-material/MarkAsUnreadOutlined';
 import { typographyClasses } from '@mui/joy/Typography';
 
-// Combined Features Component
 export default function Features() {
   function TwoSidedLayout({ children, reversed }) {
     return (
       <>
         <div id='features'>
           <Box
+            data-aos="fade-up" // Add AOS animation here
             sx={{
               display: 'flex',
               justifyContent: 'center',
@@ -64,6 +64,7 @@ export default function Features() {
           ]}
         >
           <Box
+            data-aos="fade-right" // Add AOS animation here
             sx={theme => ({
               display: 'flex',
               flexDirection: 'column',
@@ -85,6 +86,7 @@ export default function Features() {
             {children}
           </Box>
           <AspectRatio
+            data-aos="fade-left" // Add AOS animation here
             ratio={700 / 520}
             variant="outlined"
             sx={theme => ({
@@ -115,10 +117,15 @@ export default function Features() {
 
   return (
     <TwoSidedLayout>
-      <Typography color="primary" sx={{ fontSize: 'lg', fontWeight: 'lg' }}>
+      <Typography
+        data-aos="fade-up" // Add AOS animation here
+        color="primary"
+        sx={{ fontSize: 'lg', fontWeight: 'lg' }}
+      >
         Clear Your Inbox
       </Typography>
       <Typography
+        data-aos="fade-up" // Add AOS animation here
         level="h1"
         sx={{
           fontWeight: 'xl',
@@ -128,16 +135,17 @@ export default function Features() {
         Unsubscribe from bothersome mailing lists
       </Typography>
       <Typography
+        data-aos="fade-up" // Add AOS animation here
         textColor="text.secondary"
         sx={{ fontSize: 'lg', lineHeight: 'lg', mb: '10px' }}
       >
         View your top senders and find out how often you read their emails. Unsubscribe from mailing lists you deem unnecessary, mark their emails as read, and delete them.
       </Typography>
       <Link href="/login" passHref>
-      <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />}>
-        Start For Free
-      </Button>
-    </Link>
+        <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />} data-aos="fade-up">
+          Start For Free
+        </Button>
+      </Link>
     </TwoSidedLayout>
   );
 }

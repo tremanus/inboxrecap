@@ -75,11 +75,12 @@ export default function Features2() {
 
   return (
     <TwoSidedLayout>
-      <Typography color="primary" sx={{ fontSize: 'lg', fontWeight: 'lg' }}>
+      <Typography color="primary" data-aos="fade-up" sx={{ fontSize: 'lg', fontWeight: 'lg' }}>
         Summarize Your Inbox
       </Typography>
       <Typography
         level="h1"
+        data-aos="fade-up"
         sx={{
           fontWeight: 'xl',
           fontSize: 'clamp(1.875rem, 1.3636rem + 2.1818vw, 3rem)',
@@ -88,13 +89,14 @@ export default function Features2() {
         Save countless hours scrolling through your emails
       </Typography>
       <Typography
+        data-aos="fade-up"
         textColor="text.secondary"
         sx={{ fontSize: 'lg', lineHeight: 'lg', mb: '10px' }}
       >
         Mark your emails from the last day as read, summarize each in one sentence, and receive them in an email all in <b>one</b> click.
       </Typography>
       <Link href="/login" passHref>
-      <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />}>
+      <Button size="lg" endDecorator={<ArrowForward fontSize="xl" />} data-aos="fade-up">
         Start For Free
       </Button>
     </Link>
