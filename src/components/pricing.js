@@ -105,7 +105,7 @@ export default function Pricing() {
                 <ListItemDecorator>
                   <Check />
                 </ListItemDecorator>
-                10 Email Unsubscribes Per Month
+                5 Email Unsubscribes Per Month
               </ListItem>
               <ListItem>
                 <ListItemDecorator>
