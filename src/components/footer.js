@@ -103,7 +103,7 @@ const Footer = () => {
             © {new Date().getFullYear()} InboxRecap. All rights reserved.
           </Typography>
           <Typography level="body2" textAlign="center" sx={{ mt: 1, color: 'text.secondary' }}>
-            Made by <Link href="https://tremanus.github.io" target="_blank" rel="noopener noreferrer" style={{ color: '#1e3a8a', fontWeight: 'bold', textDecoration: 'none' }}>Biya</Link>
+            Made by <Link href="https://biyabrook.com" target="_blank" rel="noopener noreferrer" style={{ color: '#1e3a8a', fontWeight: 'bold', textDecoration: 'none' }}>Biya</Link>
           </Typography>
         </Box>
       </Container>
