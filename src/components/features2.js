@@ -6,11 +6,42 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 import AspectRatio from '@mui/joy/AspectRatio';
 import Box from '@mui/joy/Box';
 import Container from '@mui/joy/Container';
+import MarkAsUnreadOutlinedIcon from '@mui/icons-material/MarkAsUnreadOutlined';
 import { typographyClasses } from '@mui/joy/Typography';
 
 export default function Features2() {
   function TwoSidedLayout({ children }) {
     return (
+      <>
+      <div id='features'>
+          <Box
+            data-aos="fade-up" // Add AOS animation here
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 20,
+              mb: 5,
+            }}
+          >
+            <Button
+              sx={{
+                backgroundColor: '#6ebef7',
+                color: 'black',
+                borderRadius: '25px',
+                padding: '8px 16px',
+                fontSize: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                textTransform: 'none',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              }}
+              startDecorator={<MarkAsUnreadOutlinedIcon sx={{ color: 'black', mr: 0.5 }} />}
+              disabled
+            >
+              <Typography sx={{ color: 'black' }}>Core Features</Typography>
+            </Button>
+          </Box>
+        </div>
       <Container
         sx={theme => ({
           position: 'relative',
@@ -70,6 +101,7 @@ export default function Features2() {
           {children}
         </Box>
       </Container>
+      </>
     );
   }
 

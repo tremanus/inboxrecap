@@ -170,7 +170,7 @@ async function getSummaryFromGPT(content) {
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',  // Use GPT-4o-mini
       messages: [
-        { role: 'system', content: 'Summarize the following email in one concise sentence. Only focus on the content of the email and avoid generic information::' },
+        { role: 'system', content: 'Summarize the following email in one concise sentence. Only focus on the content of the email and avoid generic information:' },
         { role: 'user', content },
       ],
     });
