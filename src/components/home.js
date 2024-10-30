@@ -41,8 +41,8 @@ const Home = () => {
           <EmailCounter />
         </div>
       </div>
-      <Features />
       <Features2 />
+      <Features />
       <Features3 />
       <Pricing />
       <FAQ />
